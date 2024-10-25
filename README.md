@@ -4,17 +4,21 @@ To use application:
 
 2. Click on website
 
-3. Open new Terminal in same dir
+To edit application:
 
-4. Run 'idle3'
+1. Open new Terminal in same dir
 
-5. Open Python files and edit project
+2. Run 'idle3' & open Python files and edit project
 
-6. Stage changes with 'git add'
+3. Else, run VS to modify other files
 
-7. Commit changes to local copy with 'git commit'
+To push changes:
 
-8. Push changes to Github Master Version with 'git push'
+1. Stage changes with 'git add'
+
+2. Commit changes to local copy with 'git commit'
+
+3. Push changes to Github Master Version with 'git push'
 
 
 BlueSky Design:
