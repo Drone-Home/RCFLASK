@@ -34,25 +34,41 @@ To connect to mobile, do the following:
 
 Completed Work:
 * Manual Controller Interface: To be Connected to the Controller Node to Steer the Car.
+
   a. Drag lever up/down to accelerate/decelerate
+
   b. Press Left or Right Buttons to steer left/right
+
   c. Can also use up/down/left/right computer keys to accelerate/decelerate/steer left/steer right
 
+
 * GPS: To be Connected with the GPS Locations of the:
+
   a. User (COMPLETED)
+
   b. R/C Car (to do)
+
   c. Drone (to do)
 
+
 * Video Feed: To be Connected to Computer Vision
+
   a. Will show what the car is 'seeing'
+
   b. Currently connects to local computer camera to prove its function
 
+
 * Website Interfacing: Using Flask
+
   a. Primary mode of Drone Home interraction
+
   b. Is Perfectly Formatted, thus far
 
+
 * Mobile Interfacing: To work on phones as well as computers
+
   a. Works, but incomplete. Formatting needs work.
+
 
 Current Design:
 
