@@ -4,12 +4,15 @@ To use application:
 
 2. Click on website
 
+*
 
-To set Location Permissions, go to the directory and in the terminal run:
+To set Location Permissions:
 
-openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+1. In this dir, run 'openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes'
 
-Then enter: US Florida Gainesville - - 127.0.0.1 -
+2. It will ask for information. Enter: US, Florida, Gainesville, -, -, 127.0.0.1, -
+
+*
 
 
 To connect to mobile, do the following:
