@@ -11,4 +11,13 @@ To push changes:
 3. Push changes to Github Master Version with 'git push'
 
 
+To edit application:
+
+1. Open new Terminal in same dir
+
+2. Run 'idle3' & open Python files and edit project
+
+3. Else, run VS to modify other files
+
+
 
