@@ -12,13 +12,7 @@ To edit application:
 
 3. Else, run VS to modify other files
 
-To push changes:
 
-1. Stage changes with 'git add'
-
-2. Commit changes to local copy with 'git commit'
-
-3. Push changes to Github Master Version with 'git push'
 
 
 BlueSky Design:
