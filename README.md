@@ -39,6 +39,6 @@ Using mobile is INCOMPLETE, and currently shows up like this:
 
 ![Moile Page](./static/images/mobileincompleteee.png)
 
-Thus, the mobile page is currently unusable and should not be run. Only run the website via computer ufl, such as Safari, Chrome, or DuckDuckGo.
+Thus, the mobile page is currently unusable and should not be run. Only run the website via local computer url, such as Safari, Chrome, or DuckDuckGo.
 
 
