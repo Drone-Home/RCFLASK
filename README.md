@@ -4,13 +4,19 @@ To use application:
 
 2. Click on website
 
-To edit application:
 
-1. Open new Terminal in same dir
+To connect to mobile, do the following:
 
-2. Run 'idle3' & open Python files and edit project
+1. Download Ngrok from ngrok.com
 
-3. Else, run VS to modify other files
+2. Run 'python3 app.py'
+
+3. In a new terminal, run 'ngrok http http://localhost:5001'
+
+4. On your mobile device, run the link it gives you.
+    i.e. https://a2ec-184-185-222-10.ngrok-free.app
+
+
 
 
 
