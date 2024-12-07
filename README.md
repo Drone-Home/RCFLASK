@@ -4,7 +4,7 @@ To use application:
 
 2. Click on website displayed in Terminal (i.e. http://127.0.0.1:5001)
 
-![Start Terminal](./static/images/startterm.png)
+![Start Terminal](./static/images/start.png)
 
 *
 
