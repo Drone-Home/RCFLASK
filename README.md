@@ -26,7 +26,7 @@ To connect to mobile, do the following:
 
 Current Design:
 
-![Connection Portal](./static/images/connect.png)
+![Connection Portal](./static/images/currentweb.png)
 
 
 BlueSky Design:
