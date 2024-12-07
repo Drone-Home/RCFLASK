@@ -37,6 +37,8 @@ BUGS!:
 
 Using mobile is INCOMPLETE, and currently shows up like this:
 
-![Moile Page](./static/images/mobileincomplete.PNG)
+![Moile Page](./static/images/mobileincompleteee.PNG)
+
+Thus, 
 
 
