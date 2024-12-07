@@ -33,3 +33,10 @@ BlueSky Design:
 
 ![Controller Page](./static/images/mainpage.png)
 
+BUGS!:
+
+Using mobile is INCOMPLETE, and currently shows up like this:
+
+![Moile Page](./static/images/mobileincomplete.png)
+
+
