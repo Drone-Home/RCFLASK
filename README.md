@@ -2,7 +2,9 @@ To use application:
 
 1. In this dir, run 'python3 app.py'
 
-2. Click on website
+2. Click on website displayed in Terminal (i.e. http://127.0.0.1:5001)
+
+![Start Terminal](./static/images/startterm.png)
 
 *
 
@@ -11,6 +13,8 @@ To set Location Permissions:
 1. In this dir, run 'openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes'
 
 2. It will ask for information. Enter: US, Florida, Gainesville, -, -, 127.0.0.1, -
+
+3. It is important to use the proper I.P. of the url being accessed ^
 
 *
 
