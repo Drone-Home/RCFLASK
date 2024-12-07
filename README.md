@@ -2,7 +2,7 @@ To use application:
 
 1. In this dir, run 'python3 app.py'
 
-2. Click on website displayed in Terminal (i.e. http://127.0.0.1:5001)
+2. Open website link displayed in Terminal (i.e. type http://127.0.0.1:5001 in Safari)
 
 Example:
 
