@@ -50,21 +50,18 @@
         </div>
     </div>
 
-    <!-- Output Window for Commands -->
-    <div class="output-window">
-        <h3>Command Log</h3>
-        <div id="output-log"></div>
-    </div>
-
+    
     <!-- Received Data Window -->
     <div class="received-data-window">
         <h3>Received Node Data</h3>
         <p><strong>Computer GPS:</strong> <span id="computer-gps">Waiting...</span></p>
         <p><strong>Drone GPS:</strong> <span id="drone-gps">Waiting...</span></p>
-        <p><strong>R/C Car GPS:</strong> <span id="car-gps">Waiting...</span></p>
+        <p><strong>Car GPS:</strong> <span id="car-gps">Waiting...</span></p>
+        <p><strong>Car Satellites:</strong> <span id="car-satellites">Waiting...</span></p>
+        <p><strong>Car Yaw:</strong> <span id="car-yaw">Waiting...</span></p>
         <p><strong>Battery Charge:</strong> <span id="battery-level">Waiting...</span>%</p>
     </div>
-
+    
     <!-- Distance Calculation Window -->
     <div class="distance-window">
         <h3>Distance Measurements</h3>
@@ -72,7 +69,13 @@
         <p><strong>R/C Car → Drone:</strong> <span id="distance-car-drone">Waiting...</span> meters</p>
         <p><strong>Drone → Computer:</strong> <span id="distance-drone-computer">Waiting...</span> meters</p>
     </div>
-
+    
+    <!-- Output Window for Commands -->
+    <div class="output-window">
+        <h3>Command Log</h3>
+        <div id="output-log"></div>
+    </div>
+    
     <!-- Link JavaScript Files -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/map.js') }}"></script>

@@ -219,6 +219,9 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
 // Function to update UI values dynamically
 function updateReceivedData(newData) {
+    
+    updateNodeData();
+    
     if (newData.computer_gps) {
         receivedData.computer_gps = newData.computer_gps;
         document.getElementById("computer-gps").textContent = 
@@ -256,6 +259,26 @@ function updateReceivedData(newData) {
                               receivedData.computer_gps.lat, receivedData.computer_gps.lon) + " m";
     }
 }
+
+function updateNodeData() {
+    fetch('/get_node_data')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('computer-gps').textContent = data.computer_gps;
+            document.getElementById('drone-gps').textContent = data.drone_gps;
+            document.getElementById('car-gps').textContent = data.car_gps;
+            document.getElementById('car-yaw').textContent = data.car_yaw;
+            document.getElementById('car-satellites').textContent = data.car_satellites;
+            document.getElementById('battery-level').textContent = data.battery_level;
+        })
+        .catch(error => console.error('Error fetching node data:', error));
+}
+
+// Refresh data 
+setInterval(updateReceivedData, 250);
+
+// Load on page
+document.addEventListener("DOMContentLoaded", updateReceivedData);
 
 // Listen for "gpsLocationUpdate" from `map.js`
 window.addEventListener("gpsLocationUpdate", (event) => {
