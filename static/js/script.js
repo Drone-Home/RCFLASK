@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const statusDisplay = document.getElementById('lever-status');
     const outputLog = document.getElementById('output-log'); // Output window log
     const autodriveButton = document.getElementById('autodrive-btn');
+    const updateCoordinateButton = document.getElementById('update-coordinate-btn');
+    const manualControlRadio = document.querySelector('input[value="manual"]');
+    const automaticControlRadio = document.querySelector('input[value="automatic"]'); 
 
     let actionIndex = 1; // Tracks number of actions
     let steering = 0; // -1 (left), 0 (neutral), 1 (right)
@@ -151,7 +154,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
             event.preventDefault();
         }
-
         switch (event.key) {
             case 'ArrowLeft':
                 leftButton.classList.remove('clicked');
@@ -189,6 +191,68 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('mouseup', function () {
         isDragging = false;
     });
+
+    leftButton.addEventListener('mousedown', function () {
+        steering = -1;
+        sendActionToServer();
+    });
+    
+    rightButton.addEventListener('mousedown', function () {
+        steering = 1;
+        sendActionToServer();
+    });
+    
+    document.addEventListener('mouseup', function () {
+        steering = 0;
+        sendActionToServer();
+    });
+
+    updateCoordinateButton.addEventListener('click', function () {
+        // Get the raw input value from the coordinate text box
+        const coordinateInput = document.getElementById('coordinate').value;
+
+        // Send the raw input string to the server
+        fetch('/set_target_coordinate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ coordinate: coordinateInput }), // Send the raw string
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Server response:', data);
+        })
+        .catch(error => {
+            console.error('Error sending coordinate to server:', error);
+        });
+    });
+
+    manualControlRadio.addEventListener('change', function () {
+        setControlMode('manual');
+    });
+    automaticControlRadio.addEventListener('change', function () {
+        setControlMode('automatic');
+    });
+
+    // Function to send control mode to the server
+    function setControlMode(mode) {
+        fetch('/set_control_mode', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ mode: mode }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Control mode set:', data);
+        })
+        .catch(error => {
+            console.error('Error setting control mode:', error);
+        });
+    }
+
 });
 
 // Store latest received data
@@ -275,7 +339,7 @@ function updateNodeData() {
 }
 
 // Refresh data 
-setInterval(updateReceivedData, 250);
+setInterval(updateReceivedData, 2000); // 250
 
 // Load on page
 document.addEventListener("DOMContentLoaded", updateReceivedData);

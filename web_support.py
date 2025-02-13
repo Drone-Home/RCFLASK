@@ -14,7 +14,8 @@ from sensor_msgs.msg import NavSatFix, NavSatStatus
 from ackermann_msgs.msg import AckermannDriveStamped
 from geometry_msgs.msg import Quaternion, PoseStamped
 from custom_messages.msg import CV 
-
+from custom_messages.srv import SetCoordinate
+from custom_messages.srv import SetMode 
 
 class WebSupport(Node):
     def __init__(self):
@@ -28,8 +29,20 @@ class WebSupport(Node):
             "car_satellites": "Waiting...",
             "battery_level": "Waiting..."
         }
+
+        self.target_coordinate = NavSatFix(latitude=29.6449, longitude=-82.3481)
+        self.control_mode = "manual" # TODO load to and from file on change or in ackermann drive
         
         super().__init__('web_support')
+
+        self.client = self.create_client(SetCoordinate, 'drone_home1/set_target_coordinate')
+        while not self.client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Service not available, waiting again...')
+
+        self.client2 = self.create_client(SetMode, 'drone_home1/set_control_mode')
+        while not self.client2.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Service not available, waiting again...')
+
         # For webdata
         self.gps_subscriber = self.create_subscription(NavSatFix, 'drone_home1/gps/fix', self.gps_callback, 10)
         self.pose_subscriber = self.create_subscription(PoseStamped, 'drone_home1/vehicle/pose', self.pose_callback, 10)
@@ -60,17 +73,13 @@ class WebSupport(Node):
         current_yaw = self.euler_from_quaternion(self.current_quaternion)[2]
         self.node_data.update({"car_yaw": f"{round(degrees(current_yaw), 2)} degrees"})
 
-
-        
     def publish_cv_box(self, box):
         x1, y1, x2, y2 = box.xyxy[0]  # Bounding box corners
         center_x = (x1 + x2) / 2
         center_y = (y1 + y2) / 2
         width = x2 - x1
         height = y2 - y1
-
         
-        # TODO Publish            
         #print(f"Center: ({center_x:.2f}, {center_y:.2f}), Size: ({width:.2f}, {height:.2f})")
         msg = CV()
         msg.x_pos = float(center_x)
@@ -95,6 +104,87 @@ class WebSupport(Node):
     def get_node_data(self):
         # Called by app.py, sends updated data
         return jsonify(self.node_data)
+    
+    def update_target_coordinate(self, coordiantes):
+        latitude, longitude = self.parse_and_verify_lat_lon(coordiantes)
+        if (latitude is not None and longitude is not None):
+            print(f"Got coordinates {latitude, longitude}")
+            # Update node coordinate
+            self.target_coordinate.latitude = latitude
+            self.target_coordinate.longitude = longitude
+
+            # Send service update
+            self.update_coordinate_service()
+
+            return latitude, longitude
+        return None
+
+    def set_control_mode(self, control_mode):
+        print(f"Got control mode {control_mode}")
+        # Update node coordinate
+        self.control_mode = control_mode
+
+        # Send service update
+        self.set_control_mode_service()
+
+        return control_mode
+    
+    def update_coordinate_service(self):
+        # Create the request message
+        request = SetCoordinate.Request()
+        print(f"{self.target_coordinate}")
+        request.new_coordinate = self.target_coordinate
+
+        # Send the request
+        self.future = self.client.call_async(request)
+        rclpy.spin_until_future_complete(self, self.future, timeout_sec=5.0)
+
+        # Check the response
+        if self.future.result() is not None:
+            self.get_logger().info(f'Service call succeeded: {self.future.result().success}')
+            return self.future.result().success
+        else:
+            self.get_logger().error('Service call failed')
+            return False
+        
+    def set_control_mode_service(self):
+        # Create the request message
+        request = SetMode.Request()
+        print(f"{self.control_mode}")
+        request.mode = self.control_mode
+
+        # Send the request
+        self.future = self.client2.call_async(request)
+        rclpy.spin_until_future_complete(self, self.future, timeout_sec=5.0)
+
+        # Check the response
+        if self.future.result() is not None:
+            self.get_logger().info(f'Service call succeeded: {self.future.result().success}')
+            return self.future.result().success
+        else:
+            self.get_logger().error('Service call failed')
+            return False
+
+    def parse_and_verify_lat_lon(self, input_str):
+        try:
+            # Split the input string by comma
+            lat_str, lon_str = input_str.strip().split(',')
+
+            # Convert to float
+            latitude = float(lat_str)
+            longitude = float(lon_str)
+
+            # Validate latitude and longitude ranges
+            if not (-90 <= latitude <= 90):
+                raise ValueError(f"Latitude {latitude} is out of range. Must be between -90 and 90.")
+            if not (-180 <= longitude <= 180):
+                raise ValueError(f"Longitude {longitude} is out of range. Must be between -180 and 180.")
+
+            return latitude, longitude
+
+        except ValueError as e:
+            print(f"Invalid input: {input_str}.Error: {e}")
+            return None, None
     
     def euler_from_quaternion(self, quaternion):
         w = quaternion.w
@@ -130,7 +220,9 @@ def main(args=None):
         rclpy.spin(web_support) 
     threading.Thread(target=ros_spin, daemon=True).start()
 
-    sleep(30)
+
+    while True:
+        sleep(5)
 
 if __name__ == '__main__':
     main()
