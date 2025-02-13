@@ -1,9 +1,7 @@
 from flask import Flask, render_template, Response, request, jsonify
 from collections import deque
 from ultralytics import YOLO  # Import YOLO
-from web_support import WebSupport
 import threading
-import rclpy
 import time
 import cv2
 
@@ -12,12 +10,26 @@ app = Flask(__name__)
 # Initialize the webcam
 camera = cv2.VideoCapture(0)
 
-# Initialize ROS in a separate thread
-rclpy.init()
-ros_node = WebSupport()
-def ros_spin():
-    rclpy.spin(ros_node)
-threading.Thread(target=ros_spin, daemon=True).start()
+# Try importing ROS
+USE_ROS = False
+try:
+    import rclpy
+    from web_support import WebSupport
+except ImportError:
+    print("ROS not available. Running in non-ROS mode.")
+    USE_ROS = False
+
+if USE_ROS:
+    from web_support import WebSupport
+    # Initialize ROS in a separate thread
+    rclpy.init()
+    ros_node = WebSupport()
+    def ros_spin():
+        rclpy.spin(ros_node)
+    threading.Thread(target=ros_spin, daemon=True).start()
+else:
+    from web_support_no_ros import WebSupport
+    ros_node = WebSupport()
 
 @app.route('/')
 def index():
@@ -115,5 +127,6 @@ def set_control_mode():
 if __name__ == '__main__':    
     app.run(debug=False, host='0.0.0.0', port=5001)
     camera.release()
-    ros_node.destroy_node()
-    rclpy.shutdown()
+    if USE_ROS:
+        ros_node.destroy_node()
+        rclpy.shutdown()
