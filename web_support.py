@@ -16,6 +16,7 @@ from geometry_msgs.msg import Quaternion, PoseStamped
 from custom_messages.msg import CV 
 from custom_messages.srv import SetCoordinate
 from custom_messages.srv import SetMode 
+from std_msgs.msg import String
 
 class WebSupport(Node):
     def __init__(self):
@@ -27,6 +28,7 @@ class WebSupport(Node):
             "drone_gps": "Waiting...",
             "car_gps": "Waiting...",
             "car_satellites": "Waiting...",
+            "car_drive_status": "Waiting...",
             "battery_level": "Waiting..."
         }
 
@@ -43,9 +45,10 @@ class WebSupport(Node):
         while not self.client2.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Service not available, waiting again...')
 
-        # For webdata
+        # Subscribers for webdata
         self.gps_subscriber = self.create_subscription(NavSatFix, 'drone_home1/gps/fix', self.gps_callback, 10)
         self.pose_subscriber = self.create_subscription(PoseStamped, 'drone_home1/vehicle/pose', self.pose_callback, 10)
+        self.drive_status_subscriber = self.create_subscription(String, 'drone_home1/vehicle/drive_status', self.drive_status_callback, 10)
 
         # Publisher for web steering
         self.publisher_ = self.create_publisher(AckermannDriveStamped, 'drone_home1/vehicle/web_controller_drive', 10)
@@ -53,9 +56,12 @@ class WebSupport(Node):
         # Publisher for CV
         self.cv_publisher_ = self.create_publisher(CV, 'drone_home1/vehicle/cv', 10)
 
+        # Class variables updated by subscribers
         self.current_position = NavSatFix()
         self.drone_position = NavSatFix()
         self.current_quaternion = Quaternion(x=0.0, y=0.0, z=0.0, w=0.0)
+        self.current_drive_status = String(data="Waiting...")
+
         self.i = 0
 
         print("Web support started")
@@ -72,6 +78,11 @@ class WebSupport(Node):
         self.current_quaternion = msg.pose.orientation
         current_yaw = self.euler_from_quaternion(self.current_quaternion)[2]
         self.node_data.update({"car_yaw": f"{round(degrees(current_yaw), 2)} degrees"})
+
+    def drive_status_callback(self, msg):
+        # Update the current drive status from the message
+        self.current_drive_status = msg.data
+        self.node_data.update({"car_drive_status": f"{self.current_drive_status}"})
 
     def publish_cv_box(self, box):
         x1, y1, x2, y2 = box.xyxy[0]  # Bounding box corners

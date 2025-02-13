@@ -333,13 +333,14 @@ function updateNodeData() {
             document.getElementById('car-gps').textContent = data.car_gps;
             document.getElementById('car-yaw').textContent = data.car_yaw;
             document.getElementById('car-satellites').textContent = data.car_satellites;
+            document.getElementById('car-drive-status').textContent = data.car_drive_status;
             document.getElementById('battery-level').textContent = data.battery_level;
         })
         .catch(error => console.error('Error fetching node data:', error));
 }
 
 // Refresh data 
-setInterval(updateReceivedData, 2000); // 250
+setInterval(updateReceivedData, 300); // 250
 
 // Load on page
 document.addEventListener("DOMContentLoaded", updateReceivedData);
