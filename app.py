@@ -91,6 +91,26 @@ def get_node_data():
     """Send the latest node data to the frontend."""
     node_data = ros_node.get_node_data()
     return node_data
+
+@app.route('/set_target_coordinate', methods=['POST'])
+def set_target_coordinate():
+    data = request.json
+    coordinate = data.get('coordinate')
+    """Send the coordinate to ros node."""
+    node_data = ros_node.update_target_coordinate(coordinate)
+    if node_data is None:
+        return jsonify({'status': 'failed'}), 500
+    return jsonify({'status': 'success'}), 200
+
+@app.route('/set_control_mode', methods=['POST'])
+def set_control_mode():
+    data = request.json
+    mode = data.get('mode')
+    """Send the mode to ros node."""
+    node_data = ros_node.set_control_mode(mode)
+    if node_data is None:
+        return jsonify({'status': 'failed'}), 500
+    return jsonify({'status': 'success'}), 200
     
 if __name__ == '__main__':    
     app.run(debug=False, host='0.0.0.0', port=5001)

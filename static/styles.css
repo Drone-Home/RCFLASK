@@ -477,3 +477,58 @@ button:hover {
     text-align: left;
     margin-top: 10px;
 }
+
+/* General Controls */
+.control-mode {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.control-mode label {
+    font-size: 16px;
+    color: black;
+}
+
+.coordinate-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.coordinate-input label {
+    font-size: 16px;
+    color: black;
+}
+
+.coordinate-input input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.coordinate-input button {
+    width: 100%;
+    font-size: 16px;
+    background-color: blue;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.coordinate-input button:hover {
+    background-color: blue;
+}
+
+.coordinate-input button:active {
+    transform: scale(0.95);
+    background-color: red;
+}
