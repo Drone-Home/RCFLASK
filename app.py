@@ -11,7 +11,7 @@ app = Flask(__name__)
 camera = cv2.VideoCapture(0)
 
 # Try importing ROS
-USE_ROS = False
+USE_ROS = True
 try:
     import rclpy
     from web_support import WebSupport

@@ -330,7 +330,7 @@ function updateNodeData() {
         .then(data => {
             //document.getElementById('computer-gps').textContent = data.computer_gps;
             document.getElementById('drone-gps').textContent = data.drone_gps;
-            document.getElementById('car-gps').textContent = data.car_gps;
+            document.getElementById('car-gps').textContent = data.car_gps.lat + ", " + data.car_gps.lon;
             document.getElementById('car-yaw').textContent = data.car_yaw;
             document.getElementById('car-satellites').textContent = data.car_satellites;
             document.getElementById('car-drive-status').textContent = data.car_drive_status;
@@ -339,8 +339,8 @@ function updateNodeData() {
         .catch(error => console.error('Error fetching node data:', error));
 }
 
-// Refresh data 
-setInterval(updateReceivedData, 300); // 250
+// Refresh node data 
+setInterval(updateReceivedData, 300);
 
 // Load on page
 document.addEventListener("DOMContentLoaded", updateReceivedData);

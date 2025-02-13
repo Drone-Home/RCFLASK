@@ -40,6 +40,7 @@ class WebSupport(Node):
         self.client = self.create_client(SetCoordinate, 'drone_home1/set_target_coordinate')
         while not self.client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Coordinate service not available, waiting again...')
+            self.get_logger().info('Car ROS nodes not running')
 
         self.client2 = self.create_client(SetMode, 'drone_home1/set_control_mode')
         while not self.client2.wait_for_service(timeout_sec=1.0):
