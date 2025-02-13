@@ -100,9 +100,38 @@ def control():
 
 @app.route('/get_node_data', methods=['GET'])
 def get_node_data():
-    """Send the latest node data to the frontend."""
-    node_data = ros_node.get_node_data()
-    return node_data
+    """Ensure we get a dictionary, not a Flask Response."""
+    raw_response = ros_node.get_node_data()
+
+    # If raw_response is a Flask Response object, convert it to a dictionary
+    if isinstance(raw_response, Response):
+        try:
+            raw_response = raw_response.get_json()  # Extract JSON
+        except Exception as e:
+            print("❌ Error parsing JSON from Response:", e)
+            return jsonify({'error': 'Failed to parse node data'}), 500
+
+    # Ensure the response is a dictionary
+    if not isinstance(raw_response, dict):
+        print(f"❌ Error: Unexpected data type: {type(raw_response)}")
+        return jsonify({'error': 'Invalid node data format'}), 500
+
+    # Convert car_gps from string to dictionary if necessary
+    if isinstance(raw_response.get("car_gps"), str):
+        try:
+            lat, lon = map(float, raw_response["car_gps"].split(","))
+            raw_response["car_gps"] = {"lat": lat, "lon": lon}
+        except ValueError:
+            print("❌ Error: Invalid GPS format in car_gps")
+            raw_response["car_gps"] = {"lat": 0, "lon": 0}  # Default if parsing fails
+
+    # Ensure other GPS fields are dictionaries
+    raw_response["computer_gps"] = raw_response.get("computer_gps", {"lat": 0, "lon": 0})
+    raw_response["drone_gps"] = raw_response.get("drone_gps", {"lat": 0, "lon": 0})
+
+    print("✅ Processed Node Data:", raw_response)  # Debugging
+    return jsonify(raw_response)
+
 
 @app.route('/set_target_coordinate', methods=['POST'])
 def set_target_coordinate():

@@ -151,19 +151,48 @@ button:hover {
     color: #333;
 }
 
-/* Output window styling */
+/* Container for received data, distance measurements, and command log */
+.data-container {
+    display: flex;
+    flex-direction: row;  /* Arrange items in a row */
+    justify-content: space-between; /* Space them evenly */
+    align-items: stretch;  /* Ensure same height */
+    gap: 10px;  /* Add spacing between the sections */
+    width: 100%;  /* Full width usage */
+    margin-top: 20px;
+}
+
+/* Each section takes up exactly one-third */
+.received-data-window,
+.distance-window {
+    flex: 1;  /* Equal width */
+    min-height: 200px;  /* Adjust as needed */
+    overflow-y: auto;  /* Allow scrolling if needed */
+    background-color: black;
+    border-radius: 10px;
+    padding: 10px;
+    color: white;
+    font-size: 14px;
+    text-align: left;
+}
+
 .output-window {
-    width: 100%;
-    height: 150px;
+    flex: 1;  /* Equal width */
+    max-height: 250px;  /* Set a fixed height */
+    overflow-y: auto;  /* Enable vertical scrolling */
     background-color: black;
     border: 2px solid blue;
     border-radius: 10px;
     padding: 10px;
     color: white;
     font-size: 14px;
-    overflow-y: auto;
     text-align: left;
 }
+
+/* Borders for clarity */
+.received-data-window { border: 2px solid green; }
+.distance-window { border: 2px solid yellow; }
+.output-window { border: 2px solid blue; }
 
 #output-log {
     height: 100%;
@@ -183,6 +212,9 @@ button:hover {
 /* Received Data Window */
 .received-data-window {
     width: 100%;
+    flex: 1;                /* Each takes equal space */
+    min-height: 200px;      /* Adjust height as needed */
+    overflow-y: auto;       /* Keeps scrolling if content overflows */
     height: auto;
     background-color: black;
     border: 2px solid green;
@@ -190,13 +222,15 @@ button:hover {
     padding: 10px;
     color: white;
     font-size: 14px;
-    overflow-y: auto;
     text-align: left;
     margin-top: 10px;
 }
 
 /* Distance Window */
 .distance-window {
+    flex: 1;                /* Each takes equal space */
+    min-height: 200px;      /* Adjust height as needed */
+    overflow-y: auto;       /* Keeps scrolling if content overflows */
     width: 100%;
     height: auto;
     background-color: black;
@@ -205,7 +239,6 @@ button:hover {
     padding: 10px;
     color: white;
     font-size: 14px;
-    overflow-y: auto;
     text-align: left;
     margin-top: 10px;
 }
@@ -229,158 +262,6 @@ button:hover {
 .autodrive-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
-}
-
-
-/* THE FOLLOWING ONLY APPLIES TO WHEN SET TO A MOBILE DEVICE */
-@media (max-width: 768px) {
-    /* Styles for mobile devices */
-    body {
-        background-color: black; /* Light gray background */
-        color: #333333; /* Dark gray text for readability */
-        font-family: 'Roboto', Arial, sans-serif; /* Clean, professional font */
-        font-size: 16px; /* Standard text size for readability */
-        line-height: 1.6; /* Good line spacing for readability */
-    }
-    
-    h1, h2, h3 {
-        color: white; /* Darker shade for headings */
-        font-family: 'Helvetica', Arial, sans-serif; /* Use a slightly different font for emphasis */
-        font-weight: 600; /* Bold headings */
-    }
-    
-    a {
-        color: #2980b9; /* Professional blue for links */
-        text-decoration: none;
-    }
-    
-    a:hover {
-        color: #3498db; /* Lighter blue when hovering */
-        text-decoration: underline;
-    }
-    
-    button {
-        background-color: red; /* Muted green for buttons */
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 4px;
-        font-family: 'Roboto', Arial, sans-serif;
-        cursor: pointer;
-    }
-    
-    button:hover {
-        background-color: red; /* Slightly darker green for hover effect */
-    }
-    
-    /* for the title image */
-    .top-image {
-        width: 100%; /* Adjust the width to make the image smaller */
-        height: auto; /* This maintains the aspect ratio */
-        
-        position: fixed; /* Keep the image always visible at the top */
-        top: 0;
-        left: 0;
-        
-        margin: 10px; /* Add some margin if needed */
-        z-index: 1000; /* Make sure the image stays above other content */
-    }
-    
-    .title-image {
-        width: 100%;
-        max-width: 400px;
-        margin-bottom: 20px;
-    }
-    
-    /* Controller container styling */
-    .controller-container {
-        width: 30%; /* Adjust to balance sizes */
-        text-align: center;
-        padding: 20px;
-        border: 2px solid blue;
-        border-radius: 10px;
-        background-color: white;
-    }
-    
-    .controller-title {
-        font-size: 20px;
-        font-weight: bold;
-        color: black;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-    
-    .controls {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-        margin-bottom: 20px;
-    }
-    
-    .control-button {
-        padding: 15px 25px;
-        font-size: 16px;
-        background-color: blue;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: background-color 0.3s, transform 0.2s;
-    }
-    
-    .control-button:hover {
-        background-color: blue;
-    }
-    
-    .control-button:active {
-        transform: scale(0.95);  /* Button shrinks slightly when clicked */
-        background-color: red;  /* Darker green when clicked */
-    }
-    
-    /* Class to simulate a clicked button when using keyboard events */
-    .control-button.clicked {
-        transform: scale(0.95);
-        background-color: red;
-    }
-    
-    #left-btn {
-        margin-right: auto;
-    }
-    
-    #right-btn {
-        margin-left: auto;
-    }
-    
-    /* Lever styles */
-    .lever-container {
-        position: relative;
-        width: 50px;
-        height: 200px;
-        background-color: #ddd;
-        border-radius: 25px;
-        margin-bottom: 15px;
-    }
-    
-    .lever {
-        width: 50px;
-        height: 50px;
-        background-color: #333;
-        border-radius: 50%;
-        position: absolute;
-        bottom: 0;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    
-    .lever:active {
-        background-color: #666;
-    }
-    
-    #lever-status {
-        font-size: 16px;
-        margin-top: 10px;
-        color: #333;
-    }
 }
 
 /* Flex container for horizontal alignment */
@@ -422,14 +303,15 @@ button:hover {
 /* Output window styling */
 .output-window {
     width: 100%;
-    height: 150px;
+    flex: 1;                /* Each takes equal space */
+    min-height: 200px;      /* Adjust height as needed */
+    overflow-y: auto;       /* Keeps scrolling if content overflows */
     background-color: black;
     border: 2px solid blue;
     border-radius: 10px;
     padding: 10px;
     color: white;
     font-size: 14px;
-    overflow-y: auto;
     text-align: left;
 }
 
@@ -446,36 +328,6 @@ button:hover {
     padding: 5px;
     font-family: 'Courier New', monospace;
     font-weight: bold;
-}
-
-/* Received Data Window */
-.received-data-window {
-    width: 100%;
-    height: auto;
-    background-color: black;
-    border: 2px solid green;
-    border-radius: 10px;
-    padding: 10px;
-    color: white;
-    font-size: 14px;
-    overflow-y: auto;
-    text-align: left;
-    margin-top: 10px;
-}
-
-/* Distance Window */
-.distance-window {
-    width: 100%;
-    height: auto;
-    background-color: black;
-    border: 2px solid yellow;
-    border-radius: 10px;
-    padding: 10px;
-    color: white;
-    font-size: 14px;
-    overflow-y: auto;
-    text-align: left;
-    margin-top: 10px;
 }
 
 /* General Controls */
@@ -531,4 +383,12 @@ button:hover {
 .coordinate-input button:active {
     transform: scale(0.95);
     background-color: red;
+}
+
+/* Data section now in a row */
+.data-container {
+    display: flex;          /* Enables flexbox */
+    justify-content: space-between;  /* Even spacing */
+    gap: 10px;              /* Adds spacing between the boxes */
+    width: 100%;            /* Ensures full width usage */
 }
