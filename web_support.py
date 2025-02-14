@@ -14,6 +14,7 @@ from sensor_msgs.msg import NavSatFix, NavSatStatus
 from ackermann_msgs.msg import AckermannDriveStamped
 from geometry_msgs.msg import Quaternion, PoseStamped
 from custom_messages.msg import CV 
+from custom_messages.msg import ServoCommand
 from custom_messages.srv import SetCoordinate
 from custom_messages.srv import SetMode 
 from std_msgs.msg import String
@@ -51,11 +52,11 @@ class WebSupport(Node):
         self.pose_subscriber = self.create_subscription(PoseStamped, 'drone_home1/vehicle/pose', self.pose_callback, 10)
         self.drive_status_subscriber = self.create_subscription(String, 'drone_home1/vehicle/drive_status', self.drive_status_callback, 10)
 
-        # Publisher for web steering
+        # Publisher for web steering, CV, charge servos
         self.publisher_ = self.create_publisher(AckermannDriveStamped, 'drone_home1/vehicle/web_controller_drive', 10)
-        
-        # Publisher for CV
         self.cv_publisher_ = self.create_publisher(CV, 'drone_home1/vehicle/cv', 10)
+        self.charge_servo_publisher = self.create_publisher(ServoCommand, 'drone_home1/vehicle/web_controller_charger', 10)
+        
 
         # Class variables updated by subscribers
         self.current_position = NavSatFix()
@@ -112,6 +113,13 @@ class WebSupport(Node):
         drive_msg.drive.steering_angle = steering_angle
         drive_msg.drive.speed = drive_speed  
         self.publisher_.publish(drive_msg)
+
+    def publish_servo_arm(self, x_axis, y_axis):
+        # Get web commands for charge servos
+        # x_axis is left/right from (-1,1)
+        # y_axis is up/down from (-1,1)
+        servo_msg = ServoCommand(servo_ids=[0,1], positions=[x_axis,y_axis])
+        self.charge_servo_publisher.publish(servo_msg)
 
     def get_node_data(self):
         # Called by app.py, sends updated data
