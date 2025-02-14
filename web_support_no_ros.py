@@ -29,6 +29,9 @@ class WebSupport():
     def publish_control(self, steering, speed):
         pass
 
+    def publish_servo_arm(self, x_axis, y_axis):
+        pass
+
     def get_node_data(self):
         # Called by app.py, sends updated data
         return jsonify(self.node_data)

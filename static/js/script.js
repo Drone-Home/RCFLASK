@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function () {
     let actionIndex = 1; // Tracks number of actions
     let steering = 0; // -1 (left), 0 (neutral), 1 (right)
     let speed = 0; // -1 (full reverse) to 1 (full forward)
+    let xAxis = 1; // charging cable servo -1 (left), 0 (neutral), 1 (right)
+    let yAxis = 1; // charging cable -1 (down), 0 (neutral), 1 (up)
     let isAutoDrive = false;
 
     // Set initial neutral position for the lever
@@ -63,15 +65,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let lastSteering = 0;
     let lastSpeed = 0;
+    let lastXAxis = 0;
+    let lastYAxis = 0;
     
     function sendActionToServer(forceUpdate = false) {
         const actionData = {
             steering: steering,
-            speed: speed
+            speed: speed,
+            xAxis: xAxis,
+            yAxis: yAxis,
         };
     
         // Only send an update if something changed OR if forced (lever movement)
-        if (forceUpdate || steering !== lastSteering || speed !== lastSpeed) {
+        if (forceUpdate || steering !== lastSteering || speed !== lastSpeed || xAxis !== lastXAxis || yAxis !== lastYAxis) {
             fetch('/control', {
                 method: 'POST',
                 headers: {
@@ -92,6 +98,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // Store last values to prevent redundant updates
             lastSteering = steering;
             lastSpeed = speed;
+            lastXAxis = xAxis;
+            lastYAxis = yAxis;
         }
     }
 
@@ -285,24 +293,25 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 function updateReceivedData(newData) {
     
     updateNodeData();
-    
     if (newData.computer_gps) {
         receivedData.computer_gps = newData.computer_gps;
         document.getElementById("computer-gps").textContent = 
-            `${newData.computer_gps.lat}, ${newData.computer_gps.lon}`;
-    }
-
+        `${newData.computer_gps.lat}, ${newData.computer_gps.lon}`;
+       }
+       
+    /*
     if (newData.drone_gps) {
         receivedData.drone_gps = newData.drone_gps;
         document.getElementById("drone-gps").textContent = 
-            `${newData.drone_gps.lat}, ${newData.drone_gps.lon}`;
+        `${newData.drone_gps.lat}, ${newData.drone_gps.lon}`;
     }
 
     if (newData.car_gps) {
         receivedData.car_gps = newData.car_gps;
         document.getElementById("car-gps").textContent = 
-            `${newData.car_gps.lat}, ${newData.car_gps.lon}`;
+        `${newData.car_gps.lat}, ${newData.car_gps.lon}`;
     }
+    */
 
     // Calculate distances without waiting for battery data
     if (receivedData.computer_gps && receivedData.car_gps) {
