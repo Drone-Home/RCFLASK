@@ -40,6 +40,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     carMarker = addOrUpdateMarker(carMarker, data.car_gps.lat, data.car_gps.lon, "R/C Car GPS");
                 }
 
+                // Update Drone GPS
+                if (data.drone_gps && data.drone_gps.lat !== 0) {
+                    carMarker = addOrUpdateMarker(carMarker, data.drone_gps.lat, data.drone_gps.lon, "Drone GPS");
+                }
+
                 // Dispatch event for other scripts
                 window.dispatchEvent(new CustomEvent("gpsLocationUpdate", { detail: data }));
             })

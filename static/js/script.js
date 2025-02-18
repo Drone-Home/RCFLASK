@@ -8,13 +8,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const autodriveButton = document.getElementById('autodrive-btn');
     const updateCoordinateButton = document.getElementById('update-coordinate-btn');
     const manualControlRadio = document.querySelector('input[value="manual"]');
-    const automaticControlRadio = document.querySelector('input[value="automatic"]'); 
+    const automaticControlRadio = document.querySelector('input[value="automatic"]');
 
     let actionIndex = 1; // Tracks number of actions
     let steering = 0; // -1 (left), 0 (neutral), 1 (right)
     let speed = 0; // -1 (full reverse) to 1 (full forward)
-    let xAxis = 1; // charging cable servo -1 (left), 0 (neutral), 1 (right)
-    let yAxis = 1; // charging cable -1 (down), 0 (neutral), 1 (up)
+    let xAxis = -1; // charging cable servo -1 (left), 0 (neutral), 1 (right)
+    let yAxis = -1; // charging cable -1 (down), 0 (neutral), 1 (up)
     let isAutoDrive = false;
 
     // Set initial neutral position for the lever
@@ -270,6 +270,8 @@ let receivedData = {
     drone_gps: null,
 };
 
+let checkboxUpdated = false;
+
 // Function to calculate distance between two GPS coordinates (Haversine Formula)
 function calculateDistance(lat1, lon1, lat2, lon2) {
     const R = 6371e3; // Earth radius in meters
@@ -338,15 +340,29 @@ function updateNodeData() {
         .then(response => response.json())
         .then(data => {
             //document.getElementById('computer-gps').textContent = data.computer_gps;
-            document.getElementById('drone-gps').textContent = data.drone_gps;
+            document.getElementById('drone-gps').textContent = data.drone_gps.lat + ", " + data.drone_gps.lon;
             document.getElementById('car-gps').textContent = data.car_gps.lat + ", " + data.car_gps.lon;
             document.getElementById('car-yaw').textContent = data.car_yaw;
             document.getElementById('car-satellites').textContent = data.car_satellites;
             document.getElementById('car-drive-status').textContent = data.car_drive_status;
             //document.getElementById('battery-level').textContent = data.battery_level;
+
+            // Update checkbox once to match loaded state
+            if (!checkboxUpdated){
+                console.log("Change modes from memory");
+                if (data.car_mode === "manual") {
+                    document.querySelector('input[value="manual"]').checked = true;
+                    checkboxUpdated = true;
+                }
+                else if (data.car_mode === "automatic") {
+                    document.querySelector('input[value="automatic"]').checked = true;
+                    checkboxUpdated = true;
+                }   
+            }  
         })
         .catch(error => console.error('Error fetching node data:', error));
 }
+
 
 // Refresh node data 
 setInterval(updateReceivedData, 300);

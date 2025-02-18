@@ -18,6 +18,7 @@ from custom_messages.msg import ServoCommand
 from custom_messages.srv import SetCoordinate
 from custom_messages.srv import SetMode 
 from std_msgs.msg import String
+from data_loader import DataLoader
 
 class WebSupport(Node):
     def __init__(self):
@@ -30,11 +31,12 @@ class WebSupport(Node):
             "car_gps": "Waiting...",
             "car_satellites": "Waiting...",
             "car_drive_status": "Waiting...",
-            "battery_level": "Waiting..."
+            "battery_level": "Waiting...",
+            "car_mode": "manual"
         }
 
         self.target_coordinate = NavSatFix(latitude=29.6449, longitude=-82.3481)
-        self.control_mode = "manual" # TODO load to and from file on change or in ackermann drive
+        self.control_mode = "" # TODO load to and from file on change or in ackermann drive
         
         super().__init__('web_support')
 
@@ -51,6 +53,7 @@ class WebSupport(Node):
         self.gps_subscriber = self.create_subscription(NavSatFix, 'drone_home1/gps/fix', self.gps_callback, 10)
         self.pose_subscriber = self.create_subscription(PoseStamped, 'drone_home1/vehicle/pose', self.pose_callback, 10)
         self.drive_status_subscriber = self.create_subscription(String, 'drone_home1/vehicle/drive_status', self.drive_status_callback, 10)
+        self.gps_controller_status_subscriber = self.create_subscription(String, 'drone_home1/vehicle/gps_controller_status', self.gps_controller_status_callback, 10)
 
         # Publisher for web steering, CV, charge servos
         self.publisher_ = self.create_publisher(AckermannDriveStamped, 'drone_home1/vehicle/web_controller_drive', 10)
@@ -63,10 +66,46 @@ class WebSupport(Node):
         self.drone_position = NavSatFix()
         self.current_quaternion = Quaternion(x=0.0, y=0.0, z=0.0, w=0.0)
         self.current_drive_status = String(data="Waiting...")
+        self.current_gps_controller_status = String(data="Waiting...")
 
         self.i = 0
 
+        # Data loader
+        file_path = "/workspaces/drone_home-dev/drone-home/ros2_ws/web_data.json"
+        self.data_loader = DataLoader(file_path)
+        self.persistent_state_load()
+        self.persistent_state_store()
+
         print("Web support started")
+
+    def persistent_state_load(self):
+        self.data_loader.load()
+        target_lat = self.data_loader.get_data("target_lat")
+        target_lon = self.data_loader.get_data("target_lon")
+        control_mode = self.data_loader.get_data("control_mode")
+
+        if (target_lat is not None and target_lon is not None):
+            self.target_coordinate.latitude = float(target_lat)
+            self.target_coordinate.longitude = float(target_lon)
+            self.update_target_coordinate(f"{self.target_coordinate.latitude},{self.target_coordinate.longitude}")
+        if (control_mode is not None):
+            self.control_mode = control_mode
+            self.set_control_mode(self.control_mode)
+          
+        '''
+        # Update all node data from loaded dictionary
+        self.data_loader.load()
+        load_data = self.data_loader.get_dict()
+        for key in self.node_data:
+            if key in load_data and load_data[key] is not None:
+                self.node_data[key] = load_data[key]
+        '''
+
+    def persistent_state_store(self):
+        self.data_loader.set_data("target_lat", f"{self.target_coordinate.latitude}")
+        self.data_loader.set_data("target_lon", f"{self.target_coordinate.longitude}")
+        self.data_loader.set_data("control_mode", self.control_mode)
+        self.data_loader.save()
 
     def gps_callback(self, msg):
         # Update the current GPS location from NavSatFix message
@@ -85,6 +124,11 @@ class WebSupport(Node):
         # Update the current drive status from the message
         self.current_drive_status = msg.data
         self.node_data.update({"car_drive_status": f"{self.current_drive_status}"})
+    
+    def gps_controller_status_callback(self, msg):
+        # Update the current target position from the message
+        self.current_gps_controller_status = msg.data
+        self.node_data.update({"drone_gps": f"{self.current_gps_controller_status}"})
 
     def publish_cv_box(self, box):
         x1, y1, x2, y2 = box.xyxy[0]  # Bounding box corners
@@ -136,6 +180,9 @@ class WebSupport(Node):
             # Send service update
             self.update_coordinate_service()
 
+            # Store
+            self.persistent_state_store()
+
             return latitude, longitude
         return None
 
@@ -146,6 +193,12 @@ class WebSupport(Node):
 
         # Send service update
         self.set_control_mode_service()
+
+        # Store
+        self.persistent_state_store()
+
+        # Update data
+        self.node_data.update({"car_mode":f"{self.control_mode}"})
 
         return control_mode
     

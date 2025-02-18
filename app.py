@@ -128,6 +128,13 @@ def get_node_data():
         except ValueError:
             print("❌ Error: Invalid GPS format in car_gps")
             raw_response["car_gps"] = {"lat": 0, "lon": 0}  # Default if parsing fails
+        
+        try:
+            lat, lon = map(float, raw_response["drone_gps"].split(","))
+            raw_response["drone_gps"] = {"lat": lat, "lon": lon}
+        except ValueError:
+            print("❌ Error: Invalid GPS format in drone_gps")
+            raw_response["drone_gps"] = {"lat": 0, "lon": 0}  # Default if parsing fails
 
     # Ensure other GPS fields are dictionaries
     raw_response["computer_gps"] = raw_response.get("computer_gps", {"lat": 0, "lon": 0})
