@@ -40,7 +40,8 @@ def generate_frames():
     """Capture frames from the webcam and process them with YOLO."""
     import os
     #model_path = os.path.abspath("./YOLOv11_custom/model-drone1.pt")
-    model_path = os.path.abspath("./YOLOv11_custom/yolov11_custom.pt")
+    #model_path = os.path.abspath("./YOLOv11_custom/yolov11_custom.pt")
+    model_path = os.path.abspath("./YOLOv11_custom/test_l_size.pt")
     model = YOLO(model_path)  # Load YOLO model
     frame_count = 0
     frame_times = deque(maxlen=300)

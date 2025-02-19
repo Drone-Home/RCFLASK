@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 // Update Drone GPS
                 if (data.drone_gps && data.drone_gps.lat !== 0) {
-                    carMarker = addOrUpdateMarker(carMarker, data.drone_gps.lat, data.drone_gps.lon, "Drone GPS");
+                    droneMarker = addOrUpdateMarker(droneMarker, data.drone_gps.lat, data.drone_gps.lon, "Drone GPS");
                 }
 
                 // Dispatch event for other scripts
