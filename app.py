@@ -31,8 +31,10 @@ else:
     from web_support_no_ros import WebSupport
     ros_node = WebSupport()
 
-# Store the last entered coordinate for the UI
+# Store the last entered/known coordinate for the UI
 target_coordinate = {"lat": 0, "lon": 0}
+computer_gps = {"lat": 0, "lon": 0}
+
 
 @app.route('/')
 def index():
@@ -106,8 +108,23 @@ def control():
     ros_node.publish_servo_arm(xAxis, yAxis) # TODO replace with x_axis and y_axis and add to controls
     return jsonify({'status': 'success', 'action': data}), 200
 
+@app.route('/set_computer_gps', methods=['POST'])
+def set_computer_gps():
+    """Receive computer GPS from map.js and store it"""
+    global computer_gps
+    try:
+        data = request.get_json()
+        computer_gps = {"lat": float(data["lat"]), "lon": float(data["lon"])}
+        print(f"✅ Received Computer GPS: {computer_gps}")
+        return jsonify({"status": "success", "computer_gps": computer_gps})
+    except Exception as e:
+        print(f"❌ Error receiving Computer GPS: {e}")
+        return jsonify({"error": "Invalid GPS data"}), 400
+    
 @app.route('/get_node_data', methods=['GET'])
 def get_node_data():
+    global last_computer_gps  # Keep the last known GPS value
+    
     """Ensure we get a dictionary, not a Flask Response."""
     raw_response = ros_node.get_node_data()
 
@@ -132,15 +149,17 @@ def get_node_data():
         except ValueError:
             print("❌ Error: Invalid GPS format in car_gps")
             raw_response["car_gps"] = {"lat": 0, "lon": 0}  # Default if parsing fails
-        
-        # ✅ Route `computer_gps` correctly
-    if isinstance(raw_response.get("computer_gps"), str):
-        try:
-            lat, lon = map(float, raw_response["computer_gps"].split(","))
-            raw_response["computer_gps"] = {"lat": lat, "lon": lon}
-        except ValueError:
-            print("❌ Error: Invalid GPS format in computer_gps")
-            raw_response["computer_gps"] = {"lat": 0, "lon": 0}
+    
+    # ✅ Ensure `target_coordinate` is always valid
+    if "target_coordinate" not in raw_response or raw_response["target_coordinate"] is None:
+        print("⚠️ `target_coordinate` missing, setting to default (0,0)")
+        raw_response["target_coordinate"] = {"lat": 0, "lon": 0}  # Default instead of undefined
+
+    # ✅ Debugging: Print the exact response from ROS
+    print(f"🔍 Raw Data from ROS: {raw_response}")
+
+    # ✅ Include computer GPS from global variable
+    raw_response["computer_gps"] = computer_gps
     
     # Ensure other GPS fields are dictionaries
     raw_response["target_coordinate"] = target_coordinate

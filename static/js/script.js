@@ -348,13 +348,40 @@ function updateReceivedData(newData) {
     */
 }
 
+// Store last known GPS values to prevent flashing
+let lastDroneGPS = "Waiting...";
+let lastComputerGPS = "Waiting...";
+
 function updateNodeData() {
     fetch('/get_node_data')
         .then(response => response.json())
         .then(data => {
-            //document.getElementById('computer-gps').textContent = data.computer_gps;
-            document.getElementById('drone-gps').textContent = data.drone_gps.lat + ", " + data.drone_gps.lon;
-            document.getElementById('car-gps').textContent = data.car_gps.lat + ", " + data.car_gps.lon;
+            console.log("✅ Fetched Data from /get_node_data:", data);
+            
+            // ✅ Ensure Computer GPS updates correctly
+            if (data.computer_gps && data.computer_gps.lat !== undefined) {
+                lastComputerGPS = `${data.computer_gps.lat}, ${data.computer_gps.lon}`;
+            } else {
+                console.warn("⚠️ Computer GPS missing from /get_node_data");
+            }
+            document.getElementById('computer-gps').textContent = lastComputerGPS;
+
+            // ✅ Ensure Drone GPS updates without flashing undefined
+            if (data.target_coordinate && data.target_coordinate.lat !== undefined) {
+                lastDroneGPS = `${data.target_coordinate.lat}, ${data.target_coordinate.lon}`;
+            } else {
+                console.warn("⚠️ Drone GPS (target_coordinate) missing, keeping last known value.");
+            }
+            document.getElementById('drone-gps').textContent = lastDroneGPS;
+
+            // ✅ Ensure Car GPS updates correctly
+            if (data.car_gps && data.car_gps.lat !== undefined) {
+                document.getElementById('car-gps').textContent = 
+                    `${data.car_gps.lat}, ${data.car_gps.lon}`;
+            } else {
+                console.warn("⚠️ Car GPS missing from /get_node_data");
+            }
+
             document.getElementById('car-yaw').textContent = data.car_yaw;
             document.getElementById('car-satellites').textContent = data.car_satellites;
             document.getElementById('car-drive-status').textContent = data.car_drive_status;

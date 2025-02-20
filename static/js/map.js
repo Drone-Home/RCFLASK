@@ -187,6 +187,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 const computerGPS = { lat, lon };
                 computerMarker = addOrUpdateMarker(computerMarker, computerGPS.lat, computerGPS.lon, "Computer GPS");
 
+                // ✅ Send computer GPS to Flask
+                fetch('/set_computer_gps', {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ lat: computerGPS.lat, lon: computerGPS.lon })
+                })
+                .then(response => response.json())
+                .then(data => console.log("✅ Sent Computer GPS to Flask:", data))
+                .catch(error => console.error("❌ Error sending computer GPS:", error));
+
                 // Dispatch event with computer GPS
                 window.dispatchEvent(new CustomEvent("gpsLocationUpdate", {
                     detail: { computer_gps: computerGPS }
