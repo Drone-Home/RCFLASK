@@ -98,9 +98,8 @@ def control():
     speed = data.get('speed')
     xAxis = data.get('xAxis')
     yAxis = data.get('yAxis')
-    print(f"___________________X:{xAxis}, Y:{yAxis}, DATA: {data}")
     ros_node.publish_control(steering, speed)  # Publish the action to the ROS topic
-    ros_node.publish_servo_arm(xAxis, yAxis) # TODO replace with x_axis and y_axis and add to controls
+    ros_node.publish_servo_arm(xAxis, yAxis)
     return jsonify({'status': 'success', 'action': data}), 200
 
 @app.route('/get_node_data', methods=['GET'])

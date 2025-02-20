@@ -13,9 +13,8 @@ document.addEventListener('DOMContentLoaded', function () {
     let actionIndex = 1; // Tracks number of actions
     let steering = 0; // -1 (left), 0 (neutral), 1 (right)
     let speed = 0; // -1 (full reverse) to 1 (full forward)
-    let xAxis = -1; // charging cable servo -1 (left), 0 (neutral), 1 (right)
-    let yAxis = -1; // charging cable -1 (down), 0 (neutral), 1 (up)
-    let isAutoDrive = false;
+    let xAxis = 0; // charging cable servo -1 (left), 0 (neutral), 1 (right)
+    let yAxis = 0; // charging cable -1 (down), 0 (neutral), 1 (up)
 
     // Set initial neutral position for the lever
     const containerHeight = leverContainer.offsetHeight;
@@ -102,6 +101,18 @@ document.addEventListener('DOMContentLoaded', function () {
             lastYAxis = yAxis;
         }
     }
+    // Limit frequency of sending to avoid lag when called too frequently
+    function throttle(func, wait) {
+        let lastTime = 0;
+        return function(...args) {
+            const now = new Date().getTime();
+            if (now - lastTime >= wait) {
+                lastTime = now;
+                func.apply(this, args);
+            }
+        };
+    }
+    const throttledSendActionToServer = throttle(sendActionToServer, 100);
 
     function adjustLeverPosition(direction) {
         const containerRect = leverContainer.getBoundingClientRect();
@@ -261,6 +272,70 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    var slider = {
+        get_position: function() {
+            var marker_pos = $('#marker').position();
+            var left_pos = marker_pos.left + slider.marker_size / 2;
+            var top_pos = marker_pos.top + slider.marker_size / 2;
+    
+            // Convert to -1 to 1 range with 0.05 increments
+            let raw_x = (left_pos * slider.xmax / slider.width) * 2 - 1;
+            let raw_y = ((slider.height - top_pos) * slider.ymax / slider.height) * 2 - 1;
+    
+            slider.position = {
+                x: Math.round(raw_x * 40) / 40,  // Round to 0.0025 increments
+                y: Math.round(raw_y * 40) / 40
+            };
+    
+            // Update output window
+            document.getElementById("lever-coords").textContent = `[${slider.position.x.toFixed(2)}, ${slider.position.y.toFixed(2)}]`;
+    
+            // Send data to Flask
+            xAxis = slider.position.x;
+            yAxis = slider.position.y;
+            throttledSendActionToServer();
+        },
+    
+        draw: function(x_size, y_size, xmax, ymax, marker_size) {
+            slider.marker_size = marker_size;
+            slider.width = x_size;
+            slider.height = y_size;
+            slider.xmax = xmax;
+            slider.ymax = ymax;
+    
+            $("#markerbounds").css({
+                "width": (x_size + marker_size) + 'px',
+                "height": (y_size + marker_size) + 'px'
+            });
+    
+            $("#box").css({
+                "width": x_size + 'px',
+                "height": y_size + 'px',
+                "top": marker_size / 2,
+                "left": marker_size / 2
+            });
+    
+            $("#marker").css({
+                "width": marker_size + 'px',
+                "height": marker_size + 'px'
+            });
+    
+            slider.get_position();
+        }
+    };
+    
+    // Enable dragging
+    $("#marker").draggable({
+        containment: "#markerbounds",
+        drag: function() {
+            slider.get_position();
+        }
+    });
+    
+    // Initialize slider (Size: 150x150, Range: -1 to 1, Marker Size: 20)
+    slider.draw(150, 150, 1, 1, 20);
+
+
 });
 
 // Store latest received data
@@ -272,80 +347,15 @@ let receivedData = {
 
 let checkboxUpdated = false;
 
-// Function to calculate distance between two GPS coordinates (Haversine Formula)
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371e3; // Earth radius in meters
-    const toRadians = (deg) => deg * (Math.PI / 180);
-
-    const φ1 = toRadians(lat1);
-    const φ2 = toRadians(lat2);
-    const Δφ = toRadians(lat2 - lat1);
-    const Δλ = toRadians(lon2 - lon1);
-
-    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return (R * c).toFixed(2); // Distance in meters
-}
-
-// Function to update UI values dynamically
-function updateReceivedData(newData) {
-    
-    updateNodeData();
-    if (newData.computer_gps) {
-        receivedData.computer_gps = newData.computer_gps;
-        document.getElementById("computer-gps").textContent = 
-        `${newData.computer_gps.lat}, ${newData.computer_gps.lon}`;
-       }
-       
-    /*
-    if (newData.drone_gps) {
-        receivedData.drone_gps = newData.drone_gps;
-        document.getElementById("drone-gps").textContent = 
-        `${newData.drone_gps.lat}, ${newData.drone_gps.lon}`;
-    }
-
-    if (newData.car_gps) {
-        receivedData.car_gps = newData.car_gps;
-        document.getElementById("car-gps").textContent = 
-        `${newData.car_gps.lat}, ${newData.car_gps.lon}`;
-    }
-    */
-
-    // Calculate distances without waiting for battery data
-    if (receivedData.computer_gps && receivedData.car_gps) {
-        document.getElementById("distance-computer-car").textContent = 
-            calculateDistance(receivedData.computer_gps.lat, receivedData.computer_gps.lon, 
-                              receivedData.car_gps.lat, receivedData.car_gps.lon) + " m";
-    }
-
-    if (receivedData.car_gps && receivedData.drone_gps) {
-        document.getElementById("distance-car-drone").textContent = 
-            calculateDistance(receivedData.car_gps.lat, receivedData.car_gps.lon, 
-                              receivedData.drone_gps.lat, receivedData.drone_gps.lon) + " m";
-    }
-
-    if (receivedData.drone_gps && receivedData.computer_gps) {
-        document.getElementById("distance-drone-computer").textContent = 
-            calculateDistance(receivedData.drone_gps.lat, receivedData.drone_gps.lon, 
-                              receivedData.computer_gps.lat, receivedData.computer_gps.lon) + " m";
-    }
-}
-
 function updateNodeData() {
     fetch('/get_node_data')
         .then(response => response.json())
         .then(data => {
-            //document.getElementById('computer-gps').textContent = data.computer_gps;
             document.getElementById('drone-gps').textContent = data.drone_gps.lat + ", " + data.drone_gps.lon;
             document.getElementById('car-gps').textContent = data.car_gps.lat + ", " + data.car_gps.lon;
             document.getElementById('car-yaw').textContent = data.car_yaw;
             document.getElementById('car-satellites').textContent = data.car_satellites;
             document.getElementById('car-drive-status').textContent = data.car_drive_status;
-            //document.getElementById('battery-level').textContent = data.battery_level;
 
             // Update checkbox once to match loaded state
             if (!checkboxUpdated){
@@ -365,12 +375,26 @@ function updateNodeData() {
 
 
 // Refresh node data 
-setInterval(updateReceivedData, 300);
+setInterval(updateNodeData, 300);
 
 // Load on page
-document.addEventListener("DOMContentLoaded", updateReceivedData);
+document.addEventListener("DOMContentLoaded", updateNodeData);
 
-// Listen for "gpsLocationUpdate" from `map.js`
+// Function to update distance values from map
+function updateDistanceData(newData) {
+    if (newData.distanceComputerCar && newData.distanceCarDrone && newData.distanceDroneComputer) {
+        document.getElementById("distance-computer-car").textContent = 
+            `${newData.distanceComputerCar.toFixed(2)} meters`;
+        document.getElementById("distance-car-drone").textContent = 
+            `${newData.distanceCarDrone.toFixed(2)} meters`;
+        document.getElementById("distance-drone-computer").textContent = 
+            `${newData.distanceDroneComputer.toFixed(2)} meters`;
+    }
+}
+
+// Listen for distance updates from `map.js`
 window.addEventListener("gpsLocationUpdate", (event) => {
-    updateReceivedData(event.detail);
+    console.log("Got distance update");
+    updateDistanceData(event.detail);
 });
+
