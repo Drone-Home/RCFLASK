@@ -229,7 +229,11 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(response => response.json())
         .then(data => {
-            console.log('Server response:', data);
+            console.log('✅ Coordinate sent to ROS:', data);
+            if (data.status === 'success') {
+                // ✅ Force an immediate map update
+                setTimeout(fetchAndUpdateGPS, 500);
+            }
         })
         .catch(error => {
             console.error('Error sending coordinate to server:', error);
@@ -293,7 +297,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
 // Function to update UI values dynamically
 function updateReceivedData(newData) {
-    
     updateNodeData();
     if (newData.computer_gps) {
         receivedData.computer_gps = newData.computer_gps;
@@ -301,7 +304,6 @@ function updateReceivedData(newData) {
         `${newData.computer_gps.lat}, ${newData.computer_gps.lon}`;
        }
        
-    /*
     if (newData.drone_gps) {
         receivedData.drone_gps = newData.drone_gps;
         document.getElementById("drone-gps").textContent = 
@@ -313,8 +315,18 @@ function updateReceivedData(newData) {
         document.getElementById("car-gps").textContent = 
         `${newData.car_gps.lat}, ${newData.car_gps.lon}`;
     }
-    */
 
+    // ✅ Update distances
+    if (newData.distanceComputerCar && newData.distanceCarDrone && newData.distanceDroneComputer) {
+        document.getElementById("distance-computer-car").textContent = 
+            `${newData.distanceComputerCar.toFixed(2)} meters`;
+        document.getElementById("distance-car-drone").textContent = 
+            `${newData.distanceCarDrone.toFixed(2)} meters`;
+        document.getElementById("distance-drone-computer").textContent = 
+            `${newData.distanceDroneComputer.toFixed(2)} meters`;
+    }
+
+    /*
     // Calculate distances without waiting for battery data
     if (receivedData.computer_gps && receivedData.car_gps) {
         document.getElementById("distance-computer-car").textContent = 
@@ -333,6 +345,7 @@ function updateReceivedData(newData) {
             calculateDistance(receivedData.drone_gps.lat, receivedData.drone_gps.lon, 
                               receivedData.computer_gps.lat, receivedData.computer_gps.lon) + " m";
     }
+    */
 }
 
 function updateNodeData() {
@@ -363,6 +376,19 @@ function updateNodeData() {
         .catch(error => console.error('Error fetching node data:', error));
 }
 
+function addOrUpdateMarker(marker, lat, lon, popupText) {
+    if (!lat || !lon || lat === 0 || lon === 0) return marker;
+
+    if (marker) {
+        marker.setLatLng([lat, lon]); // Move existing marker
+    } else {
+        marker = L.marker([lat, lon], { color: 'red' }) // Use a distinct color
+                  .addTo(map)
+                  .bindPopup(popupText)
+                  .openPopup();
+    }
+    return marker;
+}
 
 // Refresh node data 
 setInterval(updateReceivedData, 300);
@@ -370,7 +396,7 @@ setInterval(updateReceivedData, 300);
 // Load on page
 document.addEventListener("DOMContentLoaded", updateReceivedData);
 
-// Listen for "gpsLocationUpdate" from `map.js`
+// ✅ Listen for distance updates from `map.js`
 window.addEventListener("gpsLocationUpdate", (event) => {
     updateReceivedData(event.detail);
 });

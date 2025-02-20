@@ -31,6 +31,9 @@ else:
     from web_support_no_ros import WebSupport
     ros_node = WebSupport()
 
+# Store the last entered coordinate for the UI
+target_coordinate = {"lat": 0, "lon": 0}
+
 @app.route('/')
 def index():
     """Render the main page."""
@@ -130,31 +133,35 @@ def get_node_data():
             print("❌ Error: Invalid GPS format in car_gps")
             raw_response["car_gps"] = {"lat": 0, "lon": 0}  # Default if parsing fails
         
-        try:
-            lat, lon = map(float, raw_response["drone_gps"].split(","))
-            raw_response["drone_gps"] = {"lat": lat, "lon": lon}
-        except ValueError:
-            print("❌ Error: Invalid GPS format in drone_gps")
-            raw_response["drone_gps"] = {"lat": 0, "lon": 0}  # Default if parsing fails
-
     # Ensure other GPS fields are dictionaries
     raw_response["computer_gps"] = raw_response.get("computer_gps", {"lat": 0, "lon": 0})
     raw_response["drone_gps"] = raw_response.get("drone_gps", {"lat": 0, "lon": 0})
-
+    raw_response["target_coordinate"] = target_coordinate
+    
     print("✅ Processed Node Data:", raw_response)  # Debugging
     return jsonify(raw_response)
 
-
 @app.route('/set_target_coordinate', methods=['POST'])
 def set_target_coordinate():
+    global target_coordinate
     data = request.json
     coordinate = data.get('coordinate')
-    """Send the coordinate to ros node."""
-    node_data = ros_node.update_target_coordinate(coordinate)
-    if node_data is None:
-        return jsonify({'status': 'failed'}), 500
-    return jsonify({'status': 'success'}), 200
 
+    try:
+        lat, lon = map(float, coordinate.split(","))
+        target_coordinate = {"lat": lat, "lon": lon}  # ✅ Store locally for UI
+        print(f"✅ Target Coordinate Updated: {target_coordinate}")
+
+        """Send the coordinate to ros node."""
+        node_data = ros_node.update_target_coordinate(coordinate)
+        if node_data is None:
+            return jsonify({'status': 'failed'}), 500
+        return jsonify({'status': 'success'}), 200
+
+    except ValueError:
+        print("❌ Invalid coordinate format received.")
+        return jsonify({'status': 'failed', 'error': 'Invalid coordinate format'}), 400
+    
 @app.route('/set_control_mode', methods=['POST'])
 def set_control_mode():
     data = request.json
