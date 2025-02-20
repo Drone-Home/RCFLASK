@@ -26,7 +26,7 @@ class WebSupport(Node):
         # Node data getter and setter
         self.node_data = {
             "computer_gps": "Waiting...",
-            "car_yaw": "Wainting...",
+            "car_yaw": "Not calibrated yet",
             "drone_gps": "Waiting...",
             "car_gps": "Waiting...",
             "car_satellites": "Waiting...",
@@ -117,8 +117,11 @@ class WebSupport(Node):
     def pose_callback(self, msg):
         # Update the current quaternion from the PoseStamped message
         self.current_quaternion = msg.pose.orientation
-        current_yaw = self.euler_from_quaternion(self.current_quaternion)[2]
+
+        # If it is calibrated pose callback is called
+        current_yaw = self.euler_from_quaternion(self.current_quaternion)[2]   
         self.node_data.update({"car_yaw": f"{round(degrees(current_yaw), 2)} degrees"})
+
 
     def drive_status_callback(self, msg):
         # Update the current drive status from the message
