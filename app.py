@@ -133,9 +133,16 @@ def get_node_data():
             print("❌ Error: Invalid GPS format in car_gps")
             raw_response["car_gps"] = {"lat": 0, "lon": 0}  # Default if parsing fails
         
+        # ✅ Route `computer_gps` correctly
+    if isinstance(raw_response.get("computer_gps"), str):
+        try:
+            lat, lon = map(float, raw_response["computer_gps"].split(","))
+            raw_response["computer_gps"] = {"lat": lat, "lon": lon}
+        except ValueError:
+            print("❌ Error: Invalid GPS format in computer_gps")
+            raw_response["computer_gps"] = {"lat": 0, "lon": 0}
+    
     # Ensure other GPS fields are dictionaries
-    raw_response["computer_gps"] = raw_response.get("computer_gps", {"lat": 0, "lon": 0})
-    raw_response["drone_gps"] = raw_response.get("drone_gps", {"lat": 0, "lon": 0})
     raw_response["target_coordinate"] = target_coordinate
     
     print("✅ Processed Node Data:", raw_response)  # Debugging
@@ -171,6 +178,22 @@ def set_control_mode():
     if node_data is None:
         return jsonify({'status': 'failed'}), 500
     return jsonify({'status': 'success'}), 200
+
+@app.route('/set_slider_position', methods=['POST'])
+def set_slider_position():
+    data = request.json
+    x = data.get('x')
+    y = data.get('y')
+
+    if x is None or y is None:
+        return jsonify({"status": "error", "message": "Invalid data"}), 400
+
+    print(f"🎮 Servo Position Updated: X={x}, Y={y}")
+
+    # TODO: Send x and y values to servos via ROS
+    # ros_node.update_servos(x, y)
+
+    return jsonify({"status": "success", "x": x, "y": y})
     
 if __name__ == '__main__':    
     app.run(debug=False, host='0.0.0.0', port=5001)

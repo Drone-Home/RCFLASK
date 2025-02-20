@@ -167,7 +167,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Fetch car GPS data every second
-    setInterval(fetchAndUpdateGPS, 1000);
+    if (typeof gpsUpdateInterval === "undefined") {
+        console.log("✅ Starting GPS updates...");
+        gpsUpdateInterval = setInterval(fetchAndUpdateGPS, 1000);
+    }
+    
 
     // Get the user's current location (Computer GPS)
     if (navigator.geolocation) {

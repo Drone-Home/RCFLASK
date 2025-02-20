@@ -400,3 +400,68 @@ document.addEventListener("DOMContentLoaded", updateReceivedData);
 window.addEventListener("gpsLocationUpdate", (event) => {
     updateReceivedData(event.detail);
 });
+
+var slider = {
+    get_position: function() {
+        var marker_pos = $('#marker').position();
+        var left_pos = marker_pos.left + slider.marker_size / 2;
+        var top_pos = marker_pos.top + slider.marker_size / 2;
+
+        // Convert to -1 to 1 range with 0.05 increments
+        let raw_x = (left_pos * slider.xmax / slider.width) * 2 - 1;
+        let raw_y = ((slider.height - top_pos) * slider.ymax / slider.height) * 2 - 1;
+
+        slider.position = {
+            x: Math.round(raw_x * 20) / 20,  // Round to 0.05 increments
+            y: Math.round(raw_y * 20) / 20
+        };
+
+        // Update output window
+        document.getElementById("lever-coords").textContent = `[${slider.position.x.toFixed(2)}, ${slider.position.y.toFixed(2)}]`;
+
+        // Send data to Flask
+        fetch('/set_slider_position', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ x: slider.position.x, y: slider.position.y })
+        }).catch(error => console.error("❌ Error sending slider data:", error));
+    },
+
+    draw: function(x_size, y_size, xmax, ymax, marker_size) {
+        slider.marker_size = marker_size;
+        slider.width = x_size;
+        slider.height = y_size;
+        slider.xmax = xmax;
+        slider.ymax = ymax;
+
+        $("#markerbounds").css({
+            "width": (x_size + marker_size) + 'px',
+            "height": (y_size + marker_size) + 'px'
+        });
+
+        $("#box").css({
+            "width": x_size + 'px',
+            "height": y_size + 'px',
+            "top": marker_size / 2,
+            "left": marker_size / 2
+        });
+
+        $("#marker").css({
+            "width": marker_size + 'px',
+            "height": marker_size + 'px'
+        });
+
+        slider.get_position();
+    }
+};
+
+// Enable dragging
+$("#marker").draggable({
+    containment: "#markerbounds",
+    drag: function() {
+        slider.get_position();
+    }
+});
+
+// Initialize slider (Size: 150x150, Range: -1 to 1, Marker Size: 20)
+slider.draw(150, 150, 1, 1, 20);

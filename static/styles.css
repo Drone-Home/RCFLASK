@@ -153,7 +153,7 @@ button:hover {
 
 /* Container for received data, distance measurements, and command log */
 .data-container {
-    display: flex;
+    flex: 1;  /* Equal width */
     flex-direction: row;  /* Arrange items in a row */
     justify-content: space-between; /* Space them evenly */
     align-items: stretch;  /* Ensure same height */
@@ -165,7 +165,7 @@ button:hover {
 /* Each section takes up exactly one-third */
 .received-data-window,
 .distance-window {
-    flex: 1;  /* Equal width */
+    flex: 0.5;  /* Equal width */
     min-height: 200px;  /* Adjust as needed */
     overflow-y: auto;  /* Allow scrolling if needed */
     background-color: black;
@@ -178,7 +178,7 @@ button:hover {
 
 .output-window {
     flex: 1;  /* Equal width */
-    max-height: 250px;  /* Set a fixed height */
+    max-height: 320px;  /* Set a fixed height */
     overflow-y: auto;  /* Enable vertical scrolling */
     background-color: black;
     border: 2px solid blue;
@@ -391,4 +391,61 @@ button:hover {
     justify-content: space-between;  /* Even spacing */
     gap: 10px;              /* Adds spacing between the boxes */
     width: 100%;            /* Ensures full width usage */
+}
+
+/* Positioning for the slider */
+#widget-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* Ensure the widget container is visible */
+#widget {
+    display: block;
+    width: 180px; /* Adjust as needed */
+    margin: 10px auto;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+}
+
+/* Ensure markerbounds is sized correctly */
+#markerbounds {
+    width: 180px;
+    height: 180px;
+    position: relative;
+    background-color: lightgray;
+}
+
+/* Box (Slider background) */
+#box {
+    width: 150px;
+    height: 150px;
+    background-color: lightsteelblue;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+}
+
+/* Marker (Draggable dot) */
+#marker {
+    width: 20px;
+    height: 20px;
+    background-color: brown;
+    border-radius: 50%;
+    position: absolute;
+    top: 75px;
+    left: 75px;
+}
+  
+#coord {
+    font-family: serif;
+    font-size: 14px;
+    margin: 0px;
+}
+
+#widget {
+    border: 1px solid black;
 }
