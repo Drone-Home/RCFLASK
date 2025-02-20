@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const updateCoordinateButton = document.getElementById('update-coordinate-btn');
     const manualControlRadio = document.querySelector('input[value="manual"]');
     const automaticControlRadio = document.querySelector('input[value="automatic"]');
+    const computerControlRadio = document.querySelector('input[value="computer"]');
 
     let actionIndex = 1; // Tracks number of actions
     let steering = 0; // -1 (left), 0 (neutral), 1 (right)
@@ -246,6 +247,9 @@ document.addEventListener('DOMContentLoaded', function () {
     automaticControlRadio.addEventListener('change', function () {
         setControlMode('automatic');
     });
+    computerControlRadio.addEventListener('change', function () {
+        setControlMode('computer');
+    });
 
     // Function to send control mode to the server
     function setControlMode(mode) {
@@ -398,6 +402,10 @@ function updateNodeData() {
                     document.querySelector('input[value="automatic"]').checked = true;
                     checkboxUpdated = true;
                 }   
+                else if (data.car_mode === "computer") {
+                    document.querySelector('input[value="computer"]').checked = true;
+                    checkboxUpdated = true;
+                }
             }  
         })
         .catch(error => console.error('Error fetching node data:', error));
