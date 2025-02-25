@@ -366,7 +366,7 @@ function updateNodeData() {
 
 
 // Refresh node data 
-setInterval(updateNodeData, 600);
+setInterval(updateNodeData, 800);
 
 // Load on page
 document.addEventListener("DOMContentLoaded", updateNodeData);

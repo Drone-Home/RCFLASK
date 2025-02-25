@@ -14,8 +14,9 @@ CAMERA_ENABLED = True
 # Queue for processed frames
 frame_queue = queue.Queue(maxsize=5) 
 
+
 # Try importing ROS
-USE_ROS = False
+USE_ROS = True
 try:
     import rclpy
     from web_support import WebSupport
@@ -97,15 +98,37 @@ def capture_and_process_frames():
 if CAMERA_ENABLED:
     threading.Thread(target=capture_and_process_frames, daemon=True).start()
 
+# Frame for before camera is loaded
+def create_placeholder_frame():
+    """Create a blank frame"""
+    width = 640
+    height = 480
+    black_frame = cv2.rectangle(
+        img=cv2.UMat(height, width, cv2.CV_8UC3),  # Create an empty image
+        pt1=(0, 0),
+        pt2=(width, height),
+        color=(0, 0, 0),  # Black color
+        thickness=-1  # Fill the rectangle
+    ).get()
+
+    cv2.putText(black_frame, "Camera Loading ...", (200, 240), cv2.FONT_HERSHEY_SIMPLEX, 
+                1, (255, 255, 255), 2, cv2.LINE_AA)  # White text
+    _, buffer = cv2.imencode('.jpg', black_frame)  # Encode as JPEG
+    return buffer.tobytes()
+
 def generate_frames():
     """Continuously send the latest available frame if there is one."""
+    first_frame_loaded = False  # Flag to indicate if the first frame has been loaded
     while True:
         if not frame_queue.empty():  # Check if there are frames available
-            frame = frame_queue.get()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            frame = frame_queue.get()  
+            first_frame_loaded = True
         else:
-            time.sleep(0.01)
+            if not first_frame_loaded:
+                frame = create_placeholder_frame()  # Create a placeholder frame if no frames are available
+            time.sleep(0.01)     
+        yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/video_feed')
 def video_feed():
