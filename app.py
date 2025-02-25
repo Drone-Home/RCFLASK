@@ -2,6 +2,7 @@ from flask import Flask, render_template, Response, request, jsonify
 from collections import deque
 from ultralytics import YOLO  # Import YOLO
 import threading
+import queue
 import time
 import cv2
 
@@ -9,6 +10,9 @@ app = Flask(__name__)
 
 # Initialize the webcam
 camera = cv2.VideoCapture(0)
+CAMERA_ENABLED = True
+# Queue for processed frames
+frame_queue = queue.Queue(maxsize=5) 
 
 # Try importing ROS
 USE_ROS = True
@@ -36,7 +40,7 @@ def index():
     """Render the main page."""
     return render_template('index.html')
 
-def generate_frames():
+def capture_and_process_frames():
     """Capture frames from the webcam and process them with YOLO."""
     import os
     #model_path = os.path.abspath("./YOLOv11_custom/model-drone1.pt")
@@ -64,7 +68,7 @@ def generate_frames():
             
             # Perform YOLO inference on the frame
             results = model.predict(frame, conf=0.5, show_labels=True, show_conf=True, classes=[0], verbose=False)
-
+            
             # Extract the processed frame
             for result in results:
                 frame = result.plot()  # Draw YOLO detections on the frame
@@ -78,12 +82,30 @@ def generate_frames():
             cv2.putText(frame, overlay_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
             # Encode the frame as JPEG
-            _, buffer = cv2.imencode('.jpg', frame)
+            encode_params = [cv2.IMWRITE_JPEG_QUALITY, 20]  # Adjust quality (1-100)
+            _, buffer = cv2.imencode('.jpg', frame, encode_params)
             frame = buffer.tobytes()
 
-            # Yield the processed frame
+            # Put frame in queue
+            if not frame_queue.full():
+                frame_queue.put(frame)
+            else:
+                frame_queue.get()  # Remove old frame
+                frame_queue.put(frame)
+
+# Start frame processing in a separate thread. Solves issue of slow connection making FPS drop. Camera runs at full speed and frames are served from queue
+if CAMERA_ENABLED:
+    threading.Thread(target=capture_and_process_frames, daemon=True).start()
+
+def generate_frames():
+    """Continuously send the latest available frame if there is one."""
+    while True:
+        if not frame_queue.empty():  # Check if there are frames available
+            frame = frame_queue.get()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        else:
+            time.sleep(0.01)
 
 @app.route('/video_feed')
 def video_feed():
@@ -98,9 +120,8 @@ def control():
     speed = data.get('speed')
     xAxis = data.get('xAxis')
     yAxis = data.get('yAxis')
-    print(f"___________________X:{xAxis}, Y:{yAxis}, DATA: {data}")
     ros_node.publish_control(steering, speed)  # Publish the action to the ROS topic
-    ros_node.publish_servo_arm(xAxis, yAxis) # TODO replace with x_axis and y_axis and add to controls
+    ros_node.publish_servo_arm(xAxis, yAxis)
     return jsonify({'status': 'success', 'action': data}), 200
 
 @app.route('/get_node_data', methods=['GET'])

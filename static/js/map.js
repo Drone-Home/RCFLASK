@@ -10,7 +10,27 @@ document.addEventListener('DOMContentLoaded', function () {
     }).addTo(map);
 
     let carMarker, droneMarker, computerMarker;
+    let computerGPSV;
 
+    // Function to calculate distance between two GPS coordinates (Haversine Formula)
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371e3; // Earth radius in meters
+        const toRadians = (deg) => (deg * Math.PI) / 180;
+    
+        const φ1 = toRadians(lat1);
+        const φ2 = toRadians(lat2);
+        const Δφ = toRadians(lat2 - lat1);
+        const Δλ = toRadians(lon2 - lon1);
+    
+        const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+                  Math.cos(φ1) * Math.cos(φ2) *
+                  Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    
+        return R * c; // Distance in meters
+    }
+    
     function addOrUpdateMarker(marker, lat, lon, popupText) {
         if (!lat || !lon || lat === 0 || lon === 0) return marker;
 
@@ -45,8 +65,30 @@ document.addEventListener('DOMContentLoaded', function () {
                     droneMarker = addOrUpdateMarker(droneMarker, data.drone_gps.lat, data.drone_gps.lon, "Drone GPS");
                 }
 
-                // Dispatch event for other scripts
-                window.dispatchEvent(new CustomEvent("gpsLocationUpdate", { detail: data }));
+                // Calculate distances
+                let carLat = data.car_gps?.lat || 0, carLon = data.car_gps?.lon || 0;
+                let droneLat = data.drone_gps?.lat || 0, droneLon = data.drone_gps?.lon || 0;
+                let computerLat = computerGPSV?.lat || 0, computerLon = computerGPSV?.lon || 0;
+                if (carLat && carLon && droneLat && droneLon && computerLat && computerLon) {
+                    let distanceComputerCar = haversineDistance(computerLat, computerLon, carLat, carLon);
+                    let distanceCarDrone = haversineDistance(carLat, carLon, droneLat, droneLon);
+                    let distanceDroneComputer = haversineDistance(droneLat, droneLon, computerLat, computerLon);
+
+                    // Send distances to script
+                    window.dispatchEvent(new CustomEvent("gpsLocationUpdate", {
+                        detail: {
+                            distanceComputerCar,
+                            distanceCarDrone,
+                            distanceDroneComputer
+                        }
+                    }));
+                }
+                else{
+                    console.log("Missing a GPS location")
+                    console.log("Car GPS:", { lat: carLat, lon: carLon });
+                    console.log("Drone GPS:", { lat: droneLat, lon: droneLon });
+                    console.log("Computer GPS:", { lat: computerLat, lon: computerLon });
+                }
             })
             .catch(error => console.error("❌ Error fetching GPS data:", error));
     }
@@ -67,11 +109,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Set computer GPS dynamically
                 const computerGPS = { lat, lon };
                 computerMarker = addOrUpdateMarker(computerMarker, computerGPS.lat, computerGPS.lon, "Computer GPS");
+                computerGPSV = computerGPS;
 
                 // Dispatch event with computer GPS
-                window.dispatchEvent(new CustomEvent("gpsLocationUpdate", {
-                    detail: { computer_gps: computerGPS }
-                }));
+                //window.dispatchEvent(new CustomEvent("gpsLocationUpdate", {
+                //    detail: { computer_gps: computerGPS }
+                //}));
             },
             function (error) {
                 console.error("❌ Geolocation error: ", error);
@@ -81,4 +124,5 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         alert("❌ Geolocation is not supported by your browser.");
     }
+
 });

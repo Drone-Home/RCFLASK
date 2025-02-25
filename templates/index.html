@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <!-- Add Leaflet.js JavaScript -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- jQuery and jQuery UI (Required for Draggable) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 </head>
 <body>
     <head>
@@ -74,20 +77,32 @@
         <div class="received-data-window">
             <h3>Received Node Data</h3>
             <!-- <p><strong>Computer GPS:</strong> <span id="computer-gps"></span></p> -->
+            <p><strong>Drone GPS:</strong> <span id="drone-gps"></span></p>
             <p><strong>Car Drive Status:</strong> <span id="car-drive-status"></span></p>
             <p><strong>Car GPS:</strong> <span id="car-gps"></span></p>
             <p><strong>Car Satellites:</strong> <span id="car-satellites"></span></p>
             <p><strong>Car Yaw:</strong> <span id="car-yaw"></span></p>
-            <p><strong>Drone GPS:</strong> <span id="drone-gps"></span></p>
+
             <!-- <p><strong>Battery Charge:</strong> <span id="battery-level"></span></p> -->
+            <p><strong>Computer → R/C Car:</strong> <span id="distance-computer-car">Waiting...</span> meters</p>
+            <p><strong>R/C Car → Drone:</strong> <span id="distance-car-drone">Waiting...</span> meters</p>
+            <p><strong>Drone → Computer:</strong> <span id="distance-drone-computer">Waiting...</span> meters</p>
         </div>
         
         <!-- Distance Calculation Window -->
         <div class="distance-window">
-            <h3>Distance Measurements</h3>
-            <p><strong>Computer → R/C Car:</strong> <span id="distance-computer-car">Waiting...</span> meters</p>
-            <p><strong>R/C Car → Drone:</strong> <span id="distance-car-drone">Waiting...</span> meters</p>
-            <p><strong>Drone → Computer:</strong> <span id="distance-drone-computer">Waiting...</span> meters</p>
+            <h3>2D Charging Probe</h3>
+             <p><strong>Lever [x,y] :</strong> <span id="lever-coords">[0.00, 0.00]</span></p>
+            <div id="widget">
+                <div id="markerbounds">
+                  <div id="box">
+                    <div id="marker"></div>
+                  </div>
+                </div>
+                <div>
+                  <p id="coord"></p>
+                </div>
+            </div>
         </div>
         
         <!-- Output Window for Commands -->
