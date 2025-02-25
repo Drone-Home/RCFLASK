@@ -120,19 +120,26 @@ button:hover {
     margin-left: auto;
 }
 
+.lever-and-slider {
+    display: flex; 
+    flex-direction: row; 
+    align-items: center; 
+    gap: 20px;
+}
+
 /* Lever styles */
 .lever-container {
     position: relative;
-    width: 50px;
-    height: 200px;
+    width: 30px;
+    height: 180px;
     background-color: #ddd;
     border-radius: 25px;
     margin-bottom: 15px;
 }
 
 .lever {
-    width: 50px;
-    height: 50px;
+    width: 30px;
+    height: 30px;
     background-color: #333;
     border-radius: 50%;
     position: absolute;
@@ -393,25 +400,12 @@ button:hover {
     width: 100%;            /* Ensures full width usage */
 }
 
-/* Positioning for the slider */
-#widget-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-}
-
 /* Ensure the widget container is visible */
 #widget {
     display: block;
-    width: 180px; /* Adjust as needed */
-    margin: 10px auto;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
 }
 
-/* Ensure markerbounds is sized correctly */
+/* Markerbounds (Gray inner border) */
 #markerbounds {
     width: 180px;
     height: 180px;

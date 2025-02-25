@@ -20,16 +20,17 @@
         <title>Car Controller</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     </head>
-    <div class="title-container">
-        <h1 class="controller-title">DRONE HOME</h1>
-    </div>
     
     <!-- Flex Container for Map and Video -->
     <div class="flex-container">
         <!-- Map Section -->
         <div class="map-container">
-            <h2>Map of Current Location and Tracked Objects</h2>
+            <!-- <h2>Map of Current Location and Tracked Objects</h2> -->
             <div id="map"></div>
+            <div class="coordinate-input">
+                <input type="text" id="coordinate" placeholder="e.g., 29.6449, -82.3481">
+                <button id="update-coordinate-btn" class="control-button">Update Target Coordinate</button>
+            </div>
         </div>
     
         <!-- Video Section -->
@@ -45,10 +46,24 @@
                 <button id="left-btn" class="control-button">Left</button>
                 <button id="right-btn" class="control-button">Right</button>
             </div>
-            <div class="lever-container">
-                <div id="lever" class="lever"></div>
+            <div class="lever-and-slider">
+                <div class="lever-container">
+                    <div id="lever" class="lever"></div>
+                </div>
+                 
+                <div id="widget">
+                    <div id="markerbounds">
+                      <div id="box">
+                        <div id="marker"></div>
+                      </div>
+                    </div>
+                    <div>
+                      <p id="coord"></p>
+                    </div>
+                </div>
             </div>
             <p id="lever-status">Drag the lever to control speed</p>
+            
         
             <!-- General Controls Section -->
             <div class="controls-section">
@@ -60,18 +75,10 @@
                         <input type="radio" name="control-mode" value="automatic"> Automatic Control
                     </label>
                 </div>
-                <div class="coordinate-input">
-                    <input type="text" id="coordinate" placeholder="e.g., 29.6449, -82.3481">
-                    <button id="update-coordinate-btn" class="control-button">Update Target Coordinate</button>
-                </div>
             </div>     
-        </div>
-
-        
+        </div>        
     </div>
 
-    
-    
     <!-- Received Data Window -->
     <div class="data-container">
         <div class="received-data-window">
@@ -91,18 +98,7 @@
         
         <!-- Distance Calculation Window -->
         <div class="distance-window">
-            <h3>2D Charging Probe</h3>
-             <p><strong>Lever [x,y] :</strong> <span id="lever-coords">[0.00, 0.00]</span></p>
-            <div id="widget">
-                <div id="markerbounds">
-                  <div id="box">
-                    <div id="marker"></div>
-                  </div>
-                </div>
-                <div>
-                  <p id="coord"></p>
-                </div>
-            </div>
+            <p><strong>Lever [x,y] :</strong> <span id="lever-coords">[0.00, 0.00]</span></p>
         </div>
         
         <!-- Output Window for Commands -->
