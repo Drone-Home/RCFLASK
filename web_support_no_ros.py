@@ -13,8 +13,8 @@ class WebSupport():
         self.node_data = {
             "computer_gps": "Waiting...",
             "car_yaw": "180.0",
-            "drone_gps": "29.632, -82.36",
-            "car_gps": "29.632671, -82.36249",
+            "drone_gps": {"lat": "29.632", "lon": "-82.36"},
+            "car_gps": {"lat": "29.632671", "lon": "-82.36249"},
             "car_satellites": "5",
             "car_drive_status": "Test status no ros",
             "battery_level": "Waiting..."

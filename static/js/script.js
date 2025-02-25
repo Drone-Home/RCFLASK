@@ -92,7 +92,10 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => {
                 console.error('Error sending action to server:', error);
             });
-    
+
+            // set slider to manual
+            controlModeSwitch.checked = true;
+
             //logCommand(actionData);
     
             // Store last values to prevent redundant updates
@@ -129,18 +132,6 @@ document.addEventListener('DOMContentLoaded', function () {
         lever.style.bottom = `${currentPosition}px`;
         updateLeverStatus(currentPosition, containerRect.height - leverHeight);
     }
-
-    /*function logCommand(commandData) {
-        const logEntry = document.createElement('div');
-        logEntry.innerHTML = `<span>Action #${actionIndex}:</span> 
-                              <span>Steering: ${commandData.steering}, Speed: ${commandData.speed.toFixed(2)}</span>`;
-        logEntry.classList.add('log-entry');
-
-        outputLog.appendChild(logEntry);
-        outputLog.scrollTop = outputLog.scrollHeight;
-        actionIndex++; // Increment action count
-    }
-    */
 
     document.addEventListener('keydown', function (event) {
         // Prevent arrow keys from scrolling the page

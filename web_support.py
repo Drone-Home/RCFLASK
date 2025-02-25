@@ -27,8 +27,8 @@ class WebSupport(Node):
         self.node_data = {
             "computer_gps": "Waiting...",
             "car_yaw": "Not calibrated yet",
-            "drone_gps": "Waiting...",
-            "car_gps": "Waiting...",
+            "drone_gps": {"lat": "0", "lon": "0"},
+            "car_gps": {"lat": "0", "lon": "0"},
             "car_satellites": "Waiting...",
             "car_drive_status": "Waiting...",
             "battery_level": "Waiting...",
@@ -110,7 +110,7 @@ class WebSupport(Node):
     def gps_callback(self, msg):
         # Update the current GPS location from NavSatFix message
         self.current_position = msg
-        self.node_data.update({"car_gps":f"{self.current_position.latitude}, {self.current_position.longitude}"})
+        self.node_data.update({"car_gps":{"lat": f"{self.current_position.latitude}", "lon": f"{self.current_position.longitude}"} })
         self.node_data.update({"car_satellites":f"{self.current_position.status.service}"})
         #print(self.current_position)
 
@@ -131,7 +131,8 @@ class WebSupport(Node):
     def gps_controller_status_callback(self, msg):
         # Update the current target position from the message
         self.current_gps_controller_status = msg.data
-        self.node_data.update({"drone_gps": f"{self.current_gps_controller_status}"})
+        lat, lon = map(float, self.current_gps_controller_status.split(","))
+        self.node_data.update({"drone_gps": {"lat": lat, "lon": lon}})
 
     def publish_cv_box(self, box):
         x1, y1, x2, y2 = box.xyxy[0]  # Bounding box corners
