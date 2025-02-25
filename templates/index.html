@@ -25,7 +25,6 @@
     <div class="flex-container">
         <!-- Map Section -->
         <div class="map-container">
-            <!-- <h2>Map of Current Location and Tracked Objects</h2> -->
             <div id="map"></div>
             <div class="coordinate-input">
                 <input type="text" id="coordinate" placeholder="e.g., 29.6449, -82.3481">
@@ -41,41 +40,37 @@
 
         <!-- Manual Controller Section -->
         <div class="controller-container">
-            <h2 class="controller-title">MANUAL CONTROLLER</h2>
+            <div class="control-switch">
+                <label class="switch">
+                    <input type="checkbox" id="control-mode-switch">
+                    <span class="slider round"></span>
+                </label>
+                <span class="controller-title">Manual Control</span>
+            </div>     
             <div class="controls">
                 <button id="left-btn" class="control-button">Left</button>
+                <div class="lever-container">
+                    <div id="lever" class="lever"></div>  
+                </div>
                 <button id="right-btn" class="control-button">Right</button>
             </div>
-            <div class="lever-and-slider">
-                <div class="lever-container">
-                    <div id="lever" class="lever"></div>
-                </div>
-                 
+            <p id="lever-status">Drag the lever to control speed</p>
+            <p><strong>Probe Controller</strong></p>
+            <div class="lever-and-slider">    
                 <div id="widget">
                     <div id="markerbounds">
-                      <div id="box">
-                        <div id="marker"></div>
-                      </div>
+                        <div id="box">
+                            <div id="marker"></div>
+                        </div>
                     </div>
                     <div>
-                      <p id="coord"></p>
+                        <p id="coord"></p>
                     </div>
                 </div>
-            </div>
-            <p id="lever-status">Drag the lever to control speed</p>
+            </div> 
             
-        
-            <!-- General Controls Section -->
-            <div class="controls-section">
-                <div class="control-mode">
-                    <label>
-                        <input type="radio" name="control-mode" value="manual" checked> Manual Control
-                    </label>
-                    <label>
-                        <input type="radio" name="control-mode" value="automatic"> Automatic Control
-                    </label>
-                </div>
-            </div>     
+            <div class="control-status-container"></div>
+          
         </div>        
     </div>
 
@@ -98,13 +93,10 @@
         
         <!-- Distance Calculation Window -->
         <div class="distance-window">
-            <p><strong>Lever [x,y] :</strong> <span id="lever-coords">[0.00, 0.00]</span></p>
         </div>
         
         <!-- Output Window for Commands -->
         <div class="output-window">
-            <h3>Command Log</h3>
-            <div id="output-log"></div>
         </div>
     </div>
     

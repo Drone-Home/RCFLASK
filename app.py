@@ -82,7 +82,7 @@ def capture_and_process_frames():
             cv2.putText(frame, overlay_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
             # Encode the frame as JPEG
-            encode_params = [cv2.IMWRITE_JPEG_QUALITY, 20]  # Adjust quality (1-100)
+            encode_params = [cv2.IMWRITE_JPEG_QUALITY, 9]  # Adjust quality (1-100)
             _, buffer = cv2.imencode('.jpg', frame, encode_params)
             frame = buffer.tobytes()
 

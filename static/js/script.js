@@ -1,3 +1,5 @@
+const controlModeSwitch = document.getElementById('control-mode-switch'); // Ensure this is defined
+
 document.addEventListener('DOMContentLoaded', function () {
     const leftButton = document.getElementById('left-btn');
     const rightButton = document.getElementById('right-btn');
@@ -7,8 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const outputLog = document.getElementById('output-log'); // Output window log
     const autodriveButton = document.getElementById('autodrive-btn');
     const updateCoordinateButton = document.getElementById('update-coordinate-btn');
-    const manualControlRadio = document.querySelector('input[value="manual"]');
-    const automaticControlRadio = document.querySelector('input[value="automatic"]');
+    
 
     let actionIndex = 1; // Tracks number of actions
     let steering = 0; // -1 (left), 0 (neutral), 1 (right)
@@ -92,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Error sending action to server:', error);
             });
     
-            logCommand(actionData);
+            //logCommand(actionData);
     
             // Store last values to prevent redundant updates
             lastSteering = steering;
@@ -129,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function () {
         updateLeverStatus(currentPosition, containerRect.height - leverHeight);
     }
 
-    function logCommand(commandData) {
+    /*function logCommand(commandData) {
         const logEntry = document.createElement('div');
         logEntry.innerHTML = `<span>Action #${actionIndex}:</span> 
                               <span>Steering: ${commandData.steering}, Speed: ${commandData.speed.toFixed(2)}</span>`;
@@ -139,6 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
         outputLog.scrollTop = outputLog.scrollHeight;
         actionIndex++; // Increment action count
     }
+    */
 
     document.addEventListener('keydown', function (event) {
         // Prevent arrow keys from scrolling the page
@@ -247,11 +249,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    manualControlRadio.addEventListener('change', function () {
-        setControlMode('manual');
-    });
-    automaticControlRadio.addEventListener('change', function () {
-        setControlMode('automatic');
+    controlModeSwitch.addEventListener('change', function () {
+        if (this.checked) {
+            setControlMode('manual');
+        } else {
+            setControlMode('automatic');
+        }
     });
 
     // Function to send control mode to the server
@@ -286,9 +289,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 x: Math.round(raw_x * 40) / 40,  // Round to 0.0025 increments
                 y: Math.round(raw_y * 40) / 40
             };
-    
-            // Update output window
-            document.getElementById("lever-coords").textContent = `[${slider.position.x.toFixed(2)}, ${slider.position.y.toFixed(2)}]`;
     
             // Send data to Flask
             xAxis = slider.position.x;
@@ -361,11 +361,11 @@ function updateNodeData() {
             if (!checkboxUpdated){
                 console.log("Change modes from memory");
                 if (data.car_mode === "manual") {
-                    document.querySelector('input[value="manual"]').checked = true;
+                    controlModeSwitch.checked = true;
                     checkboxUpdated = true;
                 }
                 else if (data.car_mode === "automatic") {
-                    document.querySelector('input[value="automatic"]').checked = true;
+                    controlModeSwitch.checked = false;
                     checkboxUpdated = true;
                 }   
             }  
@@ -375,7 +375,7 @@ function updateNodeData() {
 
 
 // Refresh node data 
-setInterval(updateNodeData, 300);
+setInterval(updateNodeData, 600);
 
 // Load on page
 document.addEventListener("DOMContentLoaded", updateNodeData);
