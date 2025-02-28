@@ -1,5 +1,5 @@
 body {
-    background-color: black; /* Light gray background */
+    background-color: lightgray; /* Light gray background  rgb(129, 193, 245);*/
     color: #333333; /* Dark gray text for readability */
     font-family: 'Roboto', Arial, sans-serif; /* Clean, professional font */
     font-size: 16px; /* Standard text size for readability */
@@ -7,13 +7,13 @@ body {
 }
 
 h1, h2, h3 {
-    color: white; /* Darker shade for headings */
+    color: rgb(0, 0, 0); /* Darker shade for headings */
     font-family: 'Helvetica', Arial, sans-serif; /* Use a slightly different font for emphasis */
     font-weight: 600; /* Bold headings */
 }
 
 a {
-    color: #2980b9; /* Professional blue for links */
+    color: #2980b9; /* Blue for links */
     text-decoration: none;
 }
 
@@ -22,49 +22,16 @@ a:hover {
     text-decoration: underline;
 }
 
-button {
-    background-color: red; /* Muted green for buttons */
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-family: 'Roboto', Arial, sans-serif;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: red; /* Slightly darker green for hover effect */
-}
-
-/* for the title image */
-.top-image {
-    width: 300px; /* Adjust the width to make the image smaller */
-    height: auto; /* This maintains the aspect ratio */
-    
-    position: fixed; /* Keep the image always visible at the top */
-    top: 0;
-    left: 0;
-    
-    margin: 10px; /* Add some margin if needed */
-    z-index: 1000; /* Make sure the image stays above other content */
-}
-
-.title-image {
-    width: 100%;
-    max-width: 400px;
-    margin-bottom: 20px;
-}
-
 /* Keep manual controller's dimensions and position */
 .controller-container {
     position: flex;
     right: 20px; /* Fixed to the right side */
     top: 100px; /* Vertically aligned */
-    padding: 20px;
-    border: 3px solid rgb(21, 0, 255);
+    padding: 15px;
+    border: 2px solid #dfdfdf;
     border-radius: 10px;
     width: 250px;
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -72,7 +39,7 @@ button:hover {
 }
 
 .controller-title {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     color: black;
     margin-bottom: 20px;
@@ -84,12 +51,13 @@ button:hover {
     justify-content: space-between;
     width: 100%;
     margin-bottom: 20px;
+    align-items: center;
 }
 
 .control-button {
     padding: 15px 25px;
     font-size: 16px;
-    background-color: blue;
+    background-color: rgb(0, 136, 247);
     color: white;
     border: none;
     border-radius: 10px;
@@ -98,41 +66,40 @@ button:hover {
 }
 
 .control-button:hover {
-    background-color: blue;
+    background-color: rgb(90, 175, 245)
 }
 
 .control-button:active {
     transform: scale(0.95);  /* Button shrinks slightly when clicked */
-    background-color: red;  /* Darker green when clicked */
+    background-color: #ddd; 
 }
 
 /* Class to simulate a clicked button when using keyboard events */
 .control-button.clicked {
     transform: scale(0.95);
-    background-color: red;
+    background-color: #ddd;
 }
 
-#left-btn {
-    margin-right: auto;
-}
-
-#right-btn {
-    margin-left: auto;
+.lever-and-slider {
+    display: flex; 
+    flex-direction: row; 
+    align-items: center; 
+    gap: 20px;
 }
 
 /* Lever styles */
 .lever-container {
     position: relative;
-    width: 50px;
-    height: 200px;
+    width: 30px;
+    height: 150px;
     background-color: #ddd;
     border-radius: 25px;
     margin-bottom: 15px;
 }
 
 .lever {
-    width: 50px;
-    height: 50px;
+    width: 30px;
+    height: 30px;
     background-color: #333;
     border-radius: 50%;
     position: absolute;
@@ -147,7 +114,15 @@ button:hover {
 
 #lever-status {
     font-size: 16px;
-    margin-top: 10px;
+    margin-top:-20px;
+    margin-bottom:5px;
+    color: #333;
+}
+
+#lever-coords {
+    font-size: 16px;
+    margin-top:-20px;
+    margin-bottom:-20px;
     color: #333;
 }
 
@@ -164,35 +139,23 @@ button:hover {
 
 /* Each section takes up exactly one-third */
 .received-data-window,
-.distance-window {
+.distance-window,
+output-window {
     flex: 0.5;  /* Equal width */
     min-height: 200px;  /* Adjust as needed */
     overflow-y: auto;  /* Allow scrolling if needed */
-    background-color: black;
+    background-color: rgb(0, 0, 0);
     border-radius: 10px;
     padding: 10px;
-    color: white;
-    font-size: 14px;
-    text-align: left;
-}
-
-.output-window {
-    flex: 1;  /* Equal width */
-    max-height: 320px;  /* Set a fixed height */
-    overflow-y: auto;  /* Enable vertical scrolling */
-    background-color: black;
-    border: 2px solid blue;
-    border-radius: 10px;
-    padding: 10px;
-    color: white;
+    color: rgb(255, 255, 255);
     font-size: 14px;
     text-align: left;
 }
 
 /* Borders for clarity */
-.received-data-window { border: 2px solid green; }
-.distance-window { border: 2px solid yellow; }
-.output-window { border: 2px solid blue; }
+.received-data-window { border: 2px solid #dfdfdf; }
+.distance-window { border: 2px solid #dfdfdf; }
+.output-window { border: 2px solid #dfdfdf; }
 
 #output-log {
     height: 100%;
@@ -216,11 +179,10 @@ button:hover {
     min-height: 200px;      /* Adjust height as needed */
     overflow-y: auto;       /* Keeps scrolling if content overflows */
     height: auto;
-    background-color: black;
-    border: 2px solid green;
+    background-color: white; /* Ensure background is white */
     border-radius: 10px;
     padding: 10px;
-    color: white;
+    color: black; /* Ensure all text is black */
     font-size: 14px;
     text-align: left;
     margin-top: 10px;
@@ -233,8 +195,7 @@ button:hover {
     overflow-y: auto;       /* Keeps scrolling if content overflows */
     width: 100%;
     height: auto;
-    background-color: black;
-    border: 2px solid yellow;
+    background-color: rgb(255, 255, 255);
     border-radius: 10px;
     padding: 10px;
     color: white;
@@ -243,25 +204,20 @@ button:hover {
     margin-top: 10px;
 }
 
-.autodrive-button {
-    background-color: #007bff;  /* Nice blue */
+/* Output window */
+.output-window {
+    flex: 1;                /* Each takes equal space */
+    min-height: 200px;      /* Adjust height as needed */
+    overflow-y: auto;       /* Keeps scrolling if content overflows */
+    width: 100%;
+    height: auto;
+    background-color: rgb(255, 255, 255);
+    border-radius: 10px;
+    padding: 10px;
     color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
-}
-
-.autodrive-button:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-}
-
-.autodrive-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
+    font-size: 14px;
+    text-align: left;
+    margin-top: 10px;
 }
 
 /* Flex container for horizontal alignment */
@@ -283,7 +239,7 @@ button:hover {
 #map {
     width: 100%; /* Ensure full width within container */
     height: 400px; /* Fixed height for the map */
-    border: 2px solid #333;
+    border: 2px solid #dfdfdf;
     border-radius: 10px;
 }
 
@@ -296,51 +252,8 @@ button:hover {
 #video-feed {
     width: 100%; /* Ensure full width within container */
     height: auto; /* Maintain aspect ratio */
-    border: 2px solid #333;
+    border: 2px solid #dfdfdf;
     border-radius: 10px;
-}
-
-/* Output window styling */
-.output-window {
-    width: 100%;
-    flex: 1;                /* Each takes equal space */
-    min-height: 200px;      /* Adjust height as needed */
-    overflow-y: auto;       /* Keeps scrolling if content overflows */
-    background-color: black;
-    border: 2px solid blue;
-    border-radius: 10px;
-    padding: 10px;
-    color: white;
-    font-size: 14px;
-    text-align: left;
-}
-
-#output-log {
-    height: 100%;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-}
-
-/* Each log entry */
-.log-entry {
-    padding: 5px;
-    font-family: 'Courier New', monospace;
-    font-weight: bold;
-}
-
-/* General Controls */
-.control-mode {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-
-.control-mode label {
-    font-size: 16px;
-    color: black;
 }
 
 .coordinate-input {
@@ -367,22 +280,6 @@ button:hover {
 
 .coordinate-input button {
     width: 100%;
-    font-size: 16px;
-    background-color: blue;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.coordinate-input button:hover {
-    background-color: blue;
-}
-
-.coordinate-input button:active {
-    transform: scale(0.95);
-    background-color: red;
 }
 
 /* Data section now in a row */
@@ -393,25 +290,13 @@ button:hover {
     width: 100%;            /* Ensures full width usage */
 }
 
-/* Positioning for the slider */
-#widget-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-}
-
 /* Ensure the widget container is visible */
 #widget {
     display: block;
-    width: 180px; /* Adjust as needed */
-    margin: 10px auto;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
+    border: 1px solid rgb(224, 223, 223);
 }
 
-/* Ensure markerbounds is sized correctly */
+/* Markerbounds (Gray inner border) */
 #markerbounds {
     width: 180px;
     height: 180px;
@@ -423,7 +308,7 @@ button:hover {
 #box {
     width: 150px;
     height: 150px;
-    background-color: lightsteelblue;
+    background-color: #ddd;
     position: absolute;
     top: 15px;
     left: 15px;
@@ -433,7 +318,7 @@ button:hover {
 #marker {
     width: 20px;
     height: 20px;
-    background-color: brown;
+    background-color: #333;
     border-radius: 50%;
     position: absolute;
     top: 75px;
@@ -446,6 +331,82 @@ button:hover {
     margin: 0px;
 }
 
-#widget {
-    border: 1px solid black;
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+  }
+  
+  /* Hide default HTML checkbox */
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+/* Switch configurable variables */
+:root {
+    --switch-width: 60px;
+    --switch-height: 30px;
+    --slider-size: calc(var(--switch-height) - 8px);
+    --slider-offset: 4px;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: var(--switch-width);
+    height: var(--switch-height);
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: var(--switch-height);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: var(--slider-size);
+    width: var(--slider-size);
+    left: var(--slider-offset);
+    bottom: var(--slider-offset);
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: rgb(33, 150, 243);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    transform: translateX(calc(var(--switch-width) - var(--slider-size) - (2 * var(--slider-offset))));
+}
+
+.control-switch {
+    display: flex;
+    gap: 10px; 
 }

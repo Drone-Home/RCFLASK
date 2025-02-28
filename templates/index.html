@@ -20,16 +20,16 @@
         <title>Car Controller</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     </head>
-    <div class="title-container">
-        <h1 class="controller-title">DRONE HOME</h1>
-    </div>
     
     <!-- Flex Container for Map and Video -->
     <div class="flex-container">
         <!-- Map Section -->
         <div class="map-container">
-            <h2>Map of Current Location and Tracked Objects</h2>
             <div id="map"></div>
+            <div class="coordinate-input">
+                <input type="text" id="coordinate" placeholder="e.g., 29.6449, -82.3481">
+                <button id="update-coordinate-btn" class="control-button">Update Target Coordinate</button>
+            </div>
         </div>
     
         <!-- Video Section -->
@@ -40,38 +40,40 @@
 
         <!-- Manual Controller Section -->
         <div class="controller-container">
-            <h2 class="controller-title">MANUAL CONTROLLER</h2>
+            <div class="control-switch">
+                <label class="switch">
+                    <input type="checkbox" id="control-mode-switch">
+                    <span class="slider round"></span>
+                </label>
+                <span class="controller-title">Manual Control</span>
+            </div>     
             <div class="controls">
                 <button id="left-btn" class="control-button">Left</button>
+                <div class="lever-container">
+                    <div id="lever" class="lever"></div>  
+                </div>
                 <button id="right-btn" class="control-button">Right</button>
             </div>
-            <div class="lever-container">
-                <div id="lever" class="lever"></div>
-            </div>
             <p id="lever-status">Drag the lever to control speed</p>
-        
-            <!-- General Controls Section -->
-            <div class="controls-section">
-                <div class="control-mode">
-                    <label>
-                        <input type="radio" name="control-mode" value="manual" checked> Manual Control
-                    </label>
-                    <label>
-                        <input type="radio" name="control-mode" value="automatic"> Automatic Control
-                    </label>
+            <p><strong>Probe Controller</strong></p>
+            <div class="lever-and-slider">    
+                <div id="widget">
+                    <div id="markerbounds">
+                        <div id="box">
+                            <div id="marker"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <p id="coord"></p>
+                    </div>
                 </div>
-                <div class="coordinate-input">
-                    <input type="text" id="coordinate" placeholder="e.g., 29.6449, -82.3481">
-                    <button id="update-coordinate-btn" class="control-button">Update Target Coordinate</button>
-                </div>
-            </div>     
-        </div>
-
-        
+            </div> 
+            
+            <div class="control-status-container"></div>
+          
+        </div>        
     </div>
 
-    
-    
     <!-- Received Data Window -->
     <div class="data-container">
         <div class="received-data-window">
@@ -91,24 +93,10 @@
         
         <!-- Distance Calculation Window -->
         <div class="distance-window">
-            <h3>2D Charging Probe</h3>
-             <p><strong>Lever [x,y] :</strong> <span id="lever-coords">[0.00, 0.00]</span></p>
-            <div id="widget">
-                <div id="markerbounds">
-                  <div id="box">
-                    <div id="marker"></div>
-                  </div>
-                </div>
-                <div>
-                  <p id="coord"></p>
-                </div>
-            </div>
         </div>
         
         <!-- Output Window for Commands -->
         <div class="output-window">
-            <h3>Command Log</h3>
-            <div id="output-log"></div>
         </div>
     </div>
     

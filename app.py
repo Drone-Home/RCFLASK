@@ -14,6 +14,7 @@ CAMERA_ENABLED = True
 # Queue for processed frames
 frame_queue = queue.Queue(maxsize=5) 
 
+
 # Try importing ROS
 USE_ROS = True
 try:
@@ -21,7 +22,7 @@ try:
     from web_support import WebSupport
 except ImportError:
     print("ROS not available. Running in non-ROS mode.")
-    USE_ROS = False
+    USE_ROS = True
 
 if USE_ROS:
     from web_support import WebSupport
@@ -82,7 +83,7 @@ def capture_and_process_frames():
             cv2.putText(frame, overlay_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
             # Encode the frame as JPEG
-            encode_params = [cv2.IMWRITE_JPEG_QUALITY, 20]  # Adjust quality (1-100)
+            encode_params = [cv2.IMWRITE_JPEG_QUALITY, 9]  # Adjust quality (1-100)
             _, buffer = cv2.imencode('.jpg', frame, encode_params)
             frame = buffer.tobytes()
 
@@ -97,15 +98,37 @@ def capture_and_process_frames():
 if CAMERA_ENABLED:
     threading.Thread(target=capture_and_process_frames, daemon=True).start()
 
+# Frame for before camera is loaded
+def create_placeholder_frame():
+    """Create a blank frame"""
+    width = 640
+    height = 480
+    black_frame = cv2.rectangle(
+        img=cv2.UMat(height, width, cv2.CV_8UC3),  # Create an empty image
+        pt1=(0, 0),
+        pt2=(width, height),
+        color=(0, 0, 0),  # Black color
+        thickness=-1  # Fill the rectangle
+    ).get()
+
+    cv2.putText(black_frame, "Camera Loading ...", (200, 240), cv2.FONT_HERSHEY_SIMPLEX, 
+                1, (255, 255, 255), 2, cv2.LINE_AA)  # White text
+    _, buffer = cv2.imencode('.jpg', black_frame)  # Encode as JPEG
+    return buffer.tobytes()
+
 def generate_frames():
     """Continuously send the latest available frame if there is one."""
+    first_frame_loaded = False  # Flag to indicate if the first frame has been loaded
     while True:
         if not frame_queue.empty():  # Check if there are frames available
-            frame = frame_queue.get()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            frame = frame_queue.get()  
+            first_frame_loaded = True
         else:
-            time.sleep(0.01)
+            if not first_frame_loaded:
+                frame = create_placeholder_frame()  # Create a placeholder frame if no frames are available
+            time.sleep(0.01)     
+        yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/video_feed')
 def video_feed():
@@ -126,44 +149,17 @@ def control():
 
 @app.route('/get_node_data', methods=['GET'])
 def get_node_data():
-    """Ensure we get a dictionary, not a Flask Response."""
+    """get node data from web support and send json"""
     raw_response = ros_node.get_node_data()
 
-    # If raw_response is a Flask Response object, convert it to a dictionary
-    if isinstance(raw_response, Response):
-        try:
-            raw_response = raw_response.get_json()  # Extract JSON
-        except Exception as e:
-            print("❌ Error parsing JSON from Response:", e)
-            return jsonify({'error': 'Failed to parse node data'}), 500
-
-    # Ensure the response is a dictionary
-    if not isinstance(raw_response, dict):
-        print(f"❌ Error: Unexpected data type: {type(raw_response)}")
+    try:
+        response = raw_response.get_json()
+    except Exception as e:
+        print("Error converting get_node_data to JSON:", e)
         return jsonify({'error': 'Invalid node data format'}), 500
 
-    # Convert car_gps from string to dictionary if necessary
-    if isinstance(raw_response.get("car_gps"), str):
-        try:
-            lat, lon = map(float, raw_response["car_gps"].split(","))
-            raw_response["car_gps"] = {"lat": lat, "lon": lon}
-        except ValueError:
-            print("❌ Error: Invalid GPS format in car_gps")
-            raw_response["car_gps"] = {"lat": 0, "lon": 0}  # Default if parsing fails
-        
-        try:
-            lat, lon = map(float, raw_response["drone_gps"].split(","))
-            raw_response["drone_gps"] = {"lat": lat, "lon": lon}
-        except ValueError:
-            print("❌ Error: Invalid GPS format in drone_gps")
-            raw_response["drone_gps"] = {"lat": 0, "lon": 0}  # Default if parsing fails
-
-    # Ensure other GPS fields are dictionaries
-    raw_response["computer_gps"] = raw_response.get("computer_gps", {"lat": 0, "lon": 0})
-    raw_response["drone_gps"] = raw_response.get("drone_gps", {"lat": 0, "lon": 0})
-
-    print("✅ Processed Node Data:", raw_response)  # Debugging
-    return jsonify(raw_response)
+    #print("Processed Node Data:", response)  # Debugging
+    return response
 
 
 @app.route('/set_target_coordinate', methods=['POST'])
