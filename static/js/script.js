@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const outputLog = document.getElementById('output-log'); // Output window log
     const autodriveButton = document.getElementById('autodrive-btn');
     const updateCoordinateButton = document.getElementById('update-coordinate-btn');
+    const switchCameraButton = document.getElementById('switch-camera-btn');
     
 
     let actionIndex = 1; // Tracks number of actions
@@ -93,8 +94,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Error sending action to server:', error);
             });
 
-            // set slider to manual
-            controlModeSwitch.checked = true;
+            // set slider to manual when controls are touched
+            /*
+            if (controlModeSwitch.checked == false){
+                controlModeSwitch.checked = true;
+                controlModeSwitch.dispatchEvent(new Event('change'));
+            }
+            */
+            
+            
 
             //logCommand(actionData);
     
@@ -237,6 +245,23 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(error => {
             console.error('Error sending coordinate to server:', error);
+        });
+    });
+
+    switchCameraButton.addEventListener('click', function () {
+        // Get the raw input value from the coordinate text box
+        const coordinateInput = document.getElementById('coordinate').value;
+
+        // Send the raw input string to the server
+        fetch('/set_camera', {
+            method: 'GET',
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Server response:', data);
+        })
+        .catch(error => {
+            console.error('Error switching camera:', error);
         });
     });
 
