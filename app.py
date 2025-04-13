@@ -66,7 +66,7 @@ def capture_and_process_frames():
                 main_camera = cv2.VideoCapture(2)
             else:
                 main_camera.release()
-                main_camera = cv2.VideoCapture(0)
+                main_camera = cv2.VideoCapture(0) # 0
             last_probe_enabled = probe_enabled
 
 
@@ -102,13 +102,13 @@ def capture_and_process_frames():
                     ros_node.publish_cv_box(box)
 
             # Overlay frame count and timestamp
-            overlay_text = f"Frame: {frame_count} | FPS: {fps:.2f}"
+            overlay_text = f"FPS: {fps:.2f}" # Frame: {frame_count} | 
             cv2.putText(frame, overlay_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
             # Overlay charger connection status
-            encoding_quality = 30 # Adjust quality (1-100) 9
+            encoding_quality = 8 # Adjust quality (1-100) 9
             if probe_enabled:
-                encoding_quality = 60
+                encoding_quality = 9 # 15
                 # conditionally better quality and voltage overlay with probe cam active
                 if USE_ROS:
                     serial_monitor.monitor_non_blocking()

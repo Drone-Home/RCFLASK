@@ -141,6 +141,15 @@ document.addEventListener('DOMContentLoaded', function () {
         updateLeverStatus(currentPosition, containerRect.height - leverHeight);
     }
 
+    function resetSliderToCenter() {
+        const containerRect = leverContainer.getBoundingClientRect();
+        const leverHeight = lever.offsetHeight;
+        const centerPosition = (containerRect.height - leverHeight) / 2;
+    
+        lever.style.bottom = `${centerPosition}px`;
+        updateLeverStatus(centerPosition, containerRect.height - leverHeight);
+    }
+
     document.addEventListener('keydown', function (event) {
         // Prevent arrow keys from scrolling the page
         if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
@@ -184,6 +193,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 rightButton.classList.remove('clicked');
                 steering = 0;
                 sendActionToServer();
+                break;
+            case 'ArrowUp':
+                resetSliderToCenter();
+                break;
+            case 'ArrowDown':
+                resetSliderToCenter();
                 break;
         }
     });
@@ -400,11 +415,11 @@ document.addEventListener("DOMContentLoaded", updateNodeData);
 function updateDistanceData(newData) {
     if (newData.distanceComputerCar && newData.distanceCarDrone && newData.distanceDroneComputer) {
         document.getElementById("distance-computer-car").textContent = 
-            `${newData.distanceComputerCar.toFixed(2)} meters`;
+            `${newData.distanceComputerCar.toFixed(2)}`;
         document.getElementById("distance-car-drone").textContent = 
-            `${newData.distanceCarDrone.toFixed(2)} meters`;
+            `${newData.distanceCarDrone.toFixed(2)}`;
         document.getElementById("distance-drone-computer").textContent = 
-            `${newData.distanceDroneComputer.toFixed(2)} meters`;
+            `${newData.distanceDroneComputer.toFixed(2)}`;
     }
 }
 
