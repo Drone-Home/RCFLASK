@@ -34,7 +34,8 @@
     
         <!-- Video Section -->
         <div class="video-container">
-            <h2>Live Webcam Feed</h2>
+            <span class="controller-title">Live Webcam Feed</span>
+            <button id="switch-camera-btn" class="control-button">Switch Camera</button>
             <img src="{{ url_for('video_feed') }}" alt="AI Video Feed" id="video-feed">
         </div>
 

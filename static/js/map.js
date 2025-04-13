@@ -33,12 +33,32 @@ document.addEventListener('DOMContentLoaded', function () {
     
     function addOrUpdateMarker(marker, lat, lon, popupText) {
         if (!lat || !lon || lat === 0 || lon === 0) return marker;
-
+    
+        let isNew = false;
+    
         if (marker) {
             marker.setLatLng([lat, lon]); // Move existing marker
         } else {
             marker = L.marker([lat, lon]).addTo(map).bindPopup(popupText);
+            isNew = true;
         }
+    
+        // Resize map with all markers
+        if (isNew) {
+            const bounds = [];
+    
+            if (computerMarker) bounds.push(computerMarker.getLatLng());
+            if (carMarker) bounds.push(carMarker.getLatLng());
+            if (droneMarker) bounds.push(droneMarker.getLatLng());
+            bounds.push([lat, lon]);
+    
+            if (bounds.length > 1) {
+                map.fitBounds(bounds, { padding: [50, 50] });
+            } else {
+                map.setView([lat, lon], 15);
+            }
+        }
+    
         return marker;
     }
 

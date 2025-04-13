@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const outputLog = document.getElementById('output-log'); // Output window log
     const autodriveButton = document.getElementById('autodrive-btn');
     const updateCoordinateButton = document.getElementById('update-coordinate-btn');
+    const switchCameraButton = document.getElementById('switch-camera-btn');
     
 
     let actionIndex = 1; // Tracks number of actions
@@ -93,8 +94,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Error sending action to server:', error);
             });
 
-            // set slider to manual
-            controlModeSwitch.checked = true;
+            // set slider to manual when controls are touched
+            /*
+            if (controlModeSwitch.checked == false){
+                controlModeSwitch.checked = true;
+                controlModeSwitch.dispatchEvent(new Event('change'));
+            }
+            */
+            
+            
 
             //logCommand(actionData);
     
@@ -131,6 +139,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         lever.style.bottom = `${currentPosition}px`;
         updateLeverStatus(currentPosition, containerRect.height - leverHeight);
+    }
+
+    function resetSliderToCenter() {
+        const containerRect = leverContainer.getBoundingClientRect();
+        const leverHeight = lever.offsetHeight;
+        const centerPosition = (containerRect.height - leverHeight) / 2;
+    
+        lever.style.bottom = `${centerPosition}px`;
+        updateLeverStatus(centerPosition, containerRect.height - leverHeight);
     }
 
     document.addEventListener('keydown', function (event) {
@@ -176,6 +193,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 rightButton.classList.remove('clicked');
                 steering = 0;
                 sendActionToServer();
+                break;
+            case 'ArrowUp':
+                resetSliderToCenter();
+                break;
+            case 'ArrowDown':
+                resetSliderToCenter();
                 break;
         }
     });
@@ -237,6 +260,23 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(error => {
             console.error('Error sending coordinate to server:', error);
+        });
+    });
+
+    switchCameraButton.addEventListener('click', function () {
+        // Get the raw input value from the coordinate text box
+        const coordinateInput = document.getElementById('coordinate').value;
+
+        // Send the raw input string to the server
+        fetch('/set_camera', {
+            method: 'GET',
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Server response:', data);
+        })
+        .catch(error => {
+            console.error('Error switching camera:', error);
         });
     });
 
@@ -375,11 +415,11 @@ document.addEventListener("DOMContentLoaded", updateNodeData);
 function updateDistanceData(newData) {
     if (newData.distanceComputerCar && newData.distanceCarDrone && newData.distanceDroneComputer) {
         document.getElementById("distance-computer-car").textContent = 
-            `${newData.distanceComputerCar.toFixed(2)} meters`;
+            `${newData.distanceComputerCar.toFixed(2)}`;
         document.getElementById("distance-car-drone").textContent = 
-            `${newData.distanceCarDrone.toFixed(2)} meters`;
+            `${newData.distanceCarDrone.toFixed(2)}`;
         document.getElementById("distance-drone-computer").textContent = 
-            `${newData.distanceDroneComputer.toFixed(2)} meters`;
+            `${newData.distanceDroneComputer.toFixed(2)}`;
     }
 }
 
