@@ -1,11 +1,15 @@
-( I accidentially deleted the last page here (cry emoji)... I will rewrite this README using our final deliverable from last semester... must readd how to run from RasPi5 )
-
 SETUP:
 * git clone this project
 * ensure python is downloaded
 * ensure flask is downloaded (python -m pip install flask)
 * ensure openvs is downloaded (python -m pip install opencv-python-headless)
-  
+
+If using the Jetson Nano Super:
+
+1. Put the RCFLASK directory into the /python_tests/ directory from the drone-home repository
+
+2. The Docker container from the drone-home repository contains all dependencies and will auto launch the website.
+
 To use application:
 
 1. In the RCFLASK dir, run 'python3 app.py' or 'python app.py' - whichever version you have
@@ -16,9 +20,7 @@ To use application:
 
 Current Display:
 
-![Current Page](./static/images/concurrentpage.png)
-
-![Current Page 2](./static/images/currentpage2.png)
+![Current Page](./static/images/currentpage.png)
 
 BlueSky Design:
 
